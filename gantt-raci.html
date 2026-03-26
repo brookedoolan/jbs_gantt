@@ -191,6 +191,7 @@
     <button class="btn" onclick="exportCSV()">↓ CSV</button>
     <button class="btn" onclick="copyData()" id="copyBtn">⎘ Copy Data</button>
     <button class="btn" onclick="window.print()">↓ PDF</button>
+    <button class="btn" id="depsBtn" onclick="toggleDeps()">⤳ Deps</button>
   </div>
 </div>
 
@@ -352,7 +353,7 @@ const TASKS = [
 // ╚══════════════════════════════════════════════════════════════════════════╝
 
 let tasks = TASKS.map(t => Object.assign({}, t));
-let nid = 300, mIsGrp = false, mIsMs = false;
+let nid = 300, mIsGrp = false, mIsMs = false, showDeps = false;
 
 const WEEKW = 30, DAYW = WEEKW / 7;
 const pd  = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); };
@@ -602,9 +603,87 @@ function copyData() {
   });
 }
 
+function toggleDeps() {
+  showDeps = !showDeps;
+  const btn = document.getElementById('depsBtn');
+  btn.classList.toggle('primary', showDeps);
+  renderDeps();
+}
+
+function renderDeps() {
+  const old = document.getElementById('dep-svg');
+  if (old) old.remove();
+  if (!showDeps) return;
+
+  const { mn, mx } = bnds();
+  const td = diff(mn, mx), tw = Math.ceil(td / 7), twpx = tw * WEEKW;
+  const h = tasks.length * 32 + 8;
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.id = 'dep-svg';
+  svg.setAttribute('width', twpx); svg.setAttribute('height', h);
+  svg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:15;overflow:visible;';
+
+  // Arrowhead markers
+  const defs = document.createElementNS(NS, 'defs');
+  [['arr','rgba(130,140,200,0.75)'],['arr-cp','rgba(255,159,67,0.9)']].forEach(([id, fill]) => {
+    const m = document.createElementNS(NS, 'marker');
+    m.setAttribute('id', id); m.setAttribute('markerWidth','7'); m.setAttribute('markerHeight','7');
+    m.setAttribute('refX','6'); m.setAttribute('refY','3.5'); m.setAttribute('orient','auto');
+    const p = document.createElementNS(NS, 'polygon');
+    p.setAttribute('points','0,0 7,3.5 0,7'); p.setAttribute('fill', fill);
+    m.appendChild(p); defs.appendChild(m);
+  });
+  svg.appendChild(defs);
+
+  tasks.forEach((t, ti) => {
+    if (!t.pred) return;
+    t.pred.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)).forEach(rowNum => {
+      const pi = rowNum - 1;
+      if (pi < 0 || pi >= tasks.length) return;
+      const pred = tasks[pi];
+      const isCp = t.cp && pred.cp;
+      const color  = isCp ? 'rgba(255,159,67,0.8)' : 'rgba(120,130,190,0.6)';
+      const marker = isCp ? 'arr-cp' : 'arr';
+
+      const predEndX  = diff(mn, pd(pred.start)) * DAYW + (pred.ms ? 7 : (pred.dur || 0) * DAYW);
+      const taskStartX = diff(mn, pd(t.start)) * DAYW - (t.ms ? 7 : 0);
+      const predY = pi * 32 + 16;
+      const taskY = ti * 32 + 16;
+
+      // Stub right, elbow down/up, then across to task start
+      const stubX = taskStartX < predEndX + 20
+        ? Math.max(predEndX, taskStartX) + 20   // backward: loop around
+        : predEndX + 14;
+
+      let d;
+      if (taskStartX >= predEndX + 14) {
+        d = `M${predEndX},${predY} H${stubX} V${taskY} H${taskStartX}`;
+      } else {
+        // Arrow has to loop back — route via a mid-row corridor
+        const midY = Math.max(predY, taskY) + 14;
+        d = `M${predEndX},${predY} H${stubX} V${midY} H${taskStartX - 14} V${taskY} H${taskStartX}`;
+      }
+
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', isCp ? '1.8' : '1.3');
+      path.setAttribute('stroke-dasharray', isCp ? 'none' : '4,3');
+      path.setAttribute('marker-end', `url(#${marker})`);
+      svg.appendChild(path);
+    });
+  });
+
+  document.getElementById('gbody').appendChild(svg);
+}
+
 function render() {
   renderL(); renderG(); syncH();
   document.querySelectorAll('.rs').forEach(apR);
+  renderDeps();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
