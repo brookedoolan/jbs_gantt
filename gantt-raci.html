@@ -219,6 +219,12 @@
         <th style="width:44px" class="ths">Stuart</th>
         <th style="width:54px" class="thsv">Supervisor</th>
         <th style="width:54px" class="thex">Ext. Advisors</th>
+        <th style="width:38px;border-left:2px solid var(--border)" class="thb">Bhr</th>
+        <th style="width:34px" class="thj">Jhr</th>
+        <th style="width:34px" class="ths">Shr</th>
+        <th style="width:38px" class="thsv">SVhr</th>
+        <th style="width:38px" class="thex">EXhr</th>
+        <th style="width:64px;border-left:2px solid var(--border)">Cost</th>
         <th style="width:72px"></th>
       </tr></thead>
       <tbody id="tb"></tbody>
@@ -255,6 +261,13 @@
       <div style="flex:1"><label>Supervisor</label><select id="msv"><option value="">–</option><option>R</option><option>A</option><option>C</option><option>I</option><option>X</option></select></div>
       <div style="flex:1"><label>Ext. Advisors</label><select id="mex"><option value="">–</option><option>R</option><option>A</option><option>C</option><option>I</option><option>X</option></select></div>
     </div>
+    <div class="fr" style="flex-direction:row;gap:10px">
+      <div style="flex:1"><label>Brooke hrs</label><input id="mhbr" type="number" min="0" value="0"></div>
+      <div style="flex:1"><label>Jack hrs</label><input id="mhjk" type="number" min="0" value="0"></div>
+      <div style="flex:1"><label>Stuart hrs</label><input id="mhst" type="number" min="0" value="0"></div>
+      <div style="flex:1"><label>Supv hrs</label><input id="mhsv" type="number" min="0" value="0"></div>
+      <div style="flex:1"><label>Ext hrs</label><input id="mhex" type="number" min="0" value="0"></div>
+    </div>
     <div class="mf">
       <button class="btn" onclick="closeM()">Cancel</button>
       <button class="btn primary" onclick="saveM()">Save</button>
@@ -282,14 +295,14 @@ const TASKS = [
   { id:11, group:false, ms:false, cp:true, name:"PDR Report", start:"2025-12-20", dur:10, pred:"7,8", brooke:"A", jack:"R", stuart:"R", supervisor:"", extAdvisors:"" },
   { id:52, group:false, ms:true, cp:true, name:"◆ Initial geometry & prelim. calcs done", start:"2026-01-01", dur:0, pred:"11", brooke:"R", jack:"R", stuart:"A", supervisor:"X", extAdvisors:"C" },
   { id:53, group:false, ms:true, cp:true, name:"◆ PDR submitted to Race2Space", start:"2026-01-04", dur:0, pred:"11", brooke:"A", jack:"R", stuart:"R", supervisor:"I", extAdvisors:"" },
-  { id:12, group:true, ms:false, cp:false, name:"Water Flow Testing & Analysis", start:"2026-01-05", dur:63, pred:"53", brooke:"R", jack:"A", stuart:"R", supervisor:"I", extAdvisors:"" },
+  { id:12, group:true, ms:false, cp:false, name:"Water Flow Testing & Analysis", start:"2026-01-05", dur:93, pred:"53", brooke:"R", jack:"A", stuart:"R", supervisor:"I", extAdvisors:"" },
   { id:13, group:false, ms:false, cp:false, name:"Prelim. Injector Samples Printed", start:"2026-01-05", dur:40, pred:"53", brooke:"", jack:"R", stuart:"R", supervisor:"", extAdvisors:"A" },
-  { id:14, group:false, ms:false, cp:false, name:"Samples Post-Processing", start:"2026-02-16", dur:9, pred:"13", brooke:"", jack:"R", stuart:"", supervisor:"", extAdvisors:"A" },
-  { id:15, group:false, ms:false, cp:false, name:"Water Flow Test Stand Mfg", start:"2026-02-14", dur:9, pred:"13", brooke:"R", jack:"A", stuart:"", supervisor:"", extAdvisors:"" },
+  { id:14, group:false, ms:false, cp:false, name:"Samples Post-Processing", start:"2026-02-14", dur:14, pred:"13", brooke:"", jack:"R", stuart:"", supervisor:"", extAdvisors:"A" },
+  { id:15, group:false, ms:false, cp:false, name:"Water Flow Test Stand Manufacture", start:"2026-02-14", dur:14, pred:"13", brooke:"R", jack:"A", stuart:"", supervisor:"", extAdvisors:"" },
   { id:16, group:false, ms:false, cp:false, name:"DAQ Hardware & Software", start:"2026-02-14", dur:14, pred:"13", brooke:"A", jack:"", stuart:"", supervisor:"", extAdvisors:"" },
-  { id:17, group:false, ms:false, cp:false, name:"Prelim. Water Flow Testing", start:"2026-03-05", dur:10, pred:"15", brooke:"R", jack:"A", stuart:"R", supervisor:"", extAdvisors:"" },
-  { id:18, group:false, ms:false, cp:false, name:"Secondary Water Flow Testing", start:"2026-03-19", dur:9, pred:"17", brooke:"R", jack:"A", stuart:"R", supervisor:"", extAdvisors:"" },
-  { id:19, group:true, ms:false, cp:true, name:"Stage 1 BRUV – 1D Optimiser", start:"2026-01-05", dur:61, pred:"53", brooke:"", jack:"", stuart:"A", supervisor:"", extAdvisors:"" },
+  { id:17, group:false, ms:false, cp:false, name:"Prelim. Water Flow Testing", start:"2026-03-01", dur:18, pred:"15", brooke:"R", jack:"A", stuart:"R", supervisor:"", extAdvisors:"" },
+  { id:18, group:false, ms:false, cp:false, name:"Secondary Water Flow Testing", start:"2026-03-19", dur:20, pred:"17", brooke:"R", jack:"A", stuart:"R", supervisor:"", extAdvisors:"" },
+  { id:19, group:true, ms:false, cp:true, name:"Stage 1 BRUV – 1D Optimiser", start:"2026-01-05", dur:95, pred:"53", brooke:"", jack:"", stuart:"A", supervisor:"", extAdvisors:"" },
   { id:20, group:false, ms:false, cp:true, name:"1D Optimiser for Chamber", start:"2026-01-05", dur:95, pred:"53", brooke:"", jack:"", stuart:"A", supervisor:"", extAdvisors:"" },
   { id:21, group:false, ms:false, cp:false, name:"1D Thermal and Stress Model", start:"2026-01-05", dur:95, pred:"53", brooke:"A", jack:"", stuart:"R", supervisor:"", extAdvisors:"" },
   { id:54, group:false, ms:true, cp:true, name:"◆ 1D CEM optimiser validated vs literature", start:"2026-04-10", dur:0, pred:"20", brooke:"R", jack:"R", stuart:"A", supervisor:"C", extAdvisors:"" },
@@ -301,7 +314,7 @@ const TASKS = [
   { id:27, group:false, ms:false, cp:false, name:"CDR Report", start:"2026-04-01", dur:17, pred:"54", brooke:"A", jack:"R", stuart:"R", supervisor:"", extAdvisors:"" },
   { id:55, group:false, ms:true, cp:true, name:"◆ Engine Design lock - Print files sent to CSIRO", start:"2026-04-12", dur:0, pred:"23,24", brooke:"R", jack:"A", stuart:"R", supervisor:"I", extAdvisors:"C" },
   { id:56, group:false, ms:true, cp:true, name:"◆ CDR submitted to Race2Space", start:"2026-04-19", dur:0, pred:"27", brooke:"R", jack:"A", stuart:"R", supervisor:"I", extAdvisors:"" },
-  { id:28, group:true, ms:false, cp:true, name:"Engine Manufacture & Assembly", start:"2026-04-16", dur:45, pred:"55", brooke:"R", jack:"A", stuart:"R", supervisor:"", extAdvisors:"" },
+  { id:28, group:true, ms:false, cp:true, name:"Engine Manufacture & Assembly", start:"2026-04-16", dur:70, pred:"55", brooke:"R", jack:"A", stuart:"R", supervisor:"", extAdvisors:"" },
   { id:29, group:false, ms:false, cp:true, name:"Final Engine Printed by CSIRO", start:"2026-04-16", dur:30, pred:"55", brooke:"", jack:"R", stuart:"", supervisor:"", extAdvisors:"A" },
   { id:30, group:false, ms:false, cp:false, name:"Thrust Structure Manufacture", start:"2026-04-16", dur:50, pred:"55", brooke:"R", jack:"A", stuart:"", supervisor:"", extAdvisors:"" },
   { id:31, group:false, ms:false, cp:false, name:"Procurement of Fittings & other testing components", start:"2026-04-20", dur:50, pred:"55", brooke:"A", jack:"R", stuart:"", supervisor:"", extAdvisors:"" },
@@ -312,15 +325,15 @@ const TASKS = [
   { id:35, group:false, ms:false, cp:true, name:"Cold Flow & Hot Fire Testing", start:"2026-07-05", dur:6, pred:"57", brooke:"R", jack:"R", stuart:"R", supervisor:"", extAdvisors:"A" },
   { id:36, group:false, ms:false, cp:true, name:"Data Analysis and CEM Refinement", start:"2026-07-09", dur:16, pred:"35", brooke:"R", jack:"R", stuart:"A", supervisor:"C", extAdvisors:"" },
   { id:58, group:false, ms:true, cp:true, name:"◆ Engine testing at Race2Space complete", start:"2026-07-10", dur:0, pred:"35", brooke:"R", jack:"R", stuart:"R", supervisor:"", extAdvisors:"A" },
-  { id:37, group:true, ms:false, cp:true, name:"Stage 2 BRUV – 3D Optimiser", start:"2026-03-31", dur:139, pred:"54", brooke:"R", jack:"R", stuart:"A", supervisor:"", extAdvisors:"" },
+  { id:37, group:true, ms:false, cp:true, name:"Stage 2 BRUV – 3D Optimiser", start:"2026-03-31", dur:194, pred:"54", brooke:"R", jack:"R", stuart:"A", supervisor:"", extAdvisors:"" },
   { id:38, group:false, ms:false, cp:true, name:"FEA Model Research & Dev", start:"2026-03-31", dur:172, pred:"54", brooke:"", jack:"R", stuart:"A", supervisor:"", extAdvisors:"" },
   { id:39, group:false, ms:false, cp:true, name:"CFD Model Research & Dev", start:"2026-03-31", dur:172, pred:"54", brooke:"", jack:"A", stuart:"R", supervisor:"", extAdvisors:"" },
-  { id:40, group:false, ms:false, cp:false, name:"Optimiser GUI", start:"2026-02-09", dur:243, pred:"54", brooke:"A", jack:"", stuart:"R", supervisor:"", extAdvisors:"" },
+  { id:40, group:false, ms:false, cp:false, name:"Optimiser GUI", start:"2026-03-31", dur:188, pred:"54", brooke:"A", jack:"", stuart:"R", supervisor:"", extAdvisors:"" },
   { id:59, group:false, ms:true, cp:true, name:"◆ Thermal modelling & CFD/FEA in optimiser", start:"2026-09-20", dur:0, pred:"38,39", brooke:"", jack:"R", stuart:"A", supervisor:"", extAdvisors:"" },
   { id:60, group:false, ms:true, cp:false, name:"◆ Cold-flow experimental data collected", start:"2026-09-30", dur:0, pred:"36", brooke:"A", jack:"R", stuart:"", supervisor:"", extAdvisors:"" },
   { id:61, group:false, ms:true, cp:true, name:"◆ Final CEM validation & UQ completed", start:"2026-10-10", dur:0, pred:"59,60", brooke:"R", jack:"R", stuart:"A", supervisor:"", extAdvisors:"" },
   { id:62, group:false, ms:true, cp:false, name:"◆ GUI for optimiser completed", start:"2026-10-10", dur:0, pred:"40", brooke:"A", jack:"", stuart:"R", supervisor:"", extAdvisors:"" },
-  { id:41, group:true, ms:false, cp:false, name:"Unimelb Capstone Assessment", start:"2026-10-01", dur:13, pred:"", brooke:"R", jack:"A", stuart:"R", supervisor:"C", extAdvisors:"" },
+  { id:41, group:true, ms:false, cp:false, name:"Unimelb Capstone Assessment", start:"2026-10-01", dur:43, pred:"", brooke:"R", jack:"A", stuart:"R", supervisor:"C", extAdvisors:"" },
   { id:42, group:false, ms:false, cp:false, name:"Draft Capstone Report", start:"2026-10-01", dur:16, pred:"", brooke:"A", jack:"R", stuart:"", supervisor:"", extAdvisors:"" },
   { id:44, group:false, ms:false, cp:false, name:"Endeavour Preparation", start:"2026-10-01", dur:16, pred:"", brooke:"R", jack:"A", stuart:"", supervisor:"", extAdvisors:"" },
   { id:63, group:false, ms:true, cp:false, name:"◆ Draft Capstone report completed", start:"2026-10-16", dur:0, pred:"42", brooke:"A", jack:"R", stuart:"", supervisor:"", extAdvisors:"" },
@@ -381,6 +394,12 @@ function renderL() {
       <td class="rc">${rsel(t.id,'stuart',t.stuart)}</td>
       <td class="rc">${rsel(t.id,'supervisor',t.supervisor)}</td>
       <td class="rc">${rsel(t.id,'extAdvisors',t.extAdvisors)}</td>
+      <td class="dc ed" style="border-left:2px solid var(--border)" onclick="ied(this,${t.id},'brookeHrs')">${t.brookeHrs||0}</td>
+      <td class="dc ed" onclick="ied(this,${t.id},'jackHrs')">${t.jackHrs||0}</td>
+      <td class="dc ed" onclick="ied(this,${t.id},'stuartHrs')">${t.stuartHrs||0}</td>
+      <td class="dc ed" onclick="ied(this,${t.id},'supervisorHrs')">${t.supervisorHrs||0}</td>
+      <td class="dc ed" onclick="ied(this,${t.id},'extAdvisorsHrs')">${t.extAdvisorsHrs||0}</td>
+      <td class="dc" style="border-left:2px solid var(--border);color:var(--i);font-weight:600">$${taskCost(t).toLocaleString()}</td>
       <td style="white-space:nowrap">
         <button class="btn" style="padding:1px 4px;font-size:10px" onclick="moveUp(${t.id})">▲</button>
         <button class="btn" style="padding:1px 4px;font-size:10px" onclick="moveDown(${t.id})">▼</button>
@@ -404,12 +423,17 @@ function rsel(id, p, v) {
 }
 function apR(s) { s.className = 'rs ' + (s.value||'e'); }
 
+const HRS = ['brookeHrs','jackHrs','stuartHrs','supervisorHrs','extAdvisorsHrs'];
+const RATES = { brookeHrs:100, jackHrs:100, stuartHrs:100, supervisorHrs:200, extAdvisorsHrs:200 };
+function taskCost(t) { return HRS.reduce((s,f) => s + (t[f]||0)*RATES[f], 0); }
+
 function ied(td, id, f) {
   const t = tasks.find(x => x.id===id);
   if (!t || (t.ms && f==='dur')) return;
-  const orig = f==='dur' ? t.dur : f==='start' ? t.start : t.pred;
+  const isNum = f==='dur' || HRS.includes(f);
+  const orig = isNum ? (t[f]||0) : f==='start' ? t.start : t.pred;
   const inp = document.createElement('input'); inp.className = 'ci';
-  inp.type = f==='dur' ? 'number' : f==='start' ? 'date' : 'text';
+  inp.type = isNum ? 'number' : f==='start' ? 'date' : 'text';
   inp.value = orig||''; td.textContent=''; td.appendChild(inp); inp.focus();
   inp.onblur = () => { sf(id, f, inp.value); render(); };
   inp.onkeydown = e => { if (e.key==='Enter') inp.blur(); };
@@ -507,7 +531,7 @@ function syncH() {
 
 function sf(id, f, v) {
   const t = tasks.find(x => x.id===id); if (!t) return;
-  if (f==='dur') t.dur = Math.max(0, parseInt(v)||0); else t[f] = v;
+  if (f==='dur' || HRS.includes(f)) t[f] = Math.max(0, parseInt(v)||0); else t[f] = v;
 }
 function del(id) { tasks = tasks.filter(t => t.id!==id); render(); }
 function moveUp(id)   { const i=tasks.findIndex(t=>t.id===id); if(i>0){[tasks[i-1],tasks[i]]=[tasks[i],tasks[i-1]];render();} }
@@ -523,6 +547,7 @@ function openM(grp, ms) {
   document.getElementById('mcp').checked=false;
   document.getElementById('mbr').value=''; document.getElementById('mjk').value=''; document.getElementById('mst').value='';
   document.getElementById('msv').value=''; document.getElementById('mex').value='';
+  ['mhbr','mhjk','mhst','mhsv','mhex'].forEach(id => document.getElementById(id).value=0);
   document.getElementById('drow').style.display = ms?'none':'flex';
   document.getElementById('modal').classList.add('open');
 }
@@ -536,18 +561,23 @@ function saveM() {
   const brooke      = document.getElementById('mbr').value;
   const jack        = document.getElementById('mjk').value;
   const stuart      = document.getElementById('mst').value;
-  const supervisor  = document.getElementById('msv').value;
-  const extAdvisors = document.getElementById('mex').value;
-  tasks.push({ id:nid++, group:mIsGrp, ms:mIsMs, cp, name, start, dur, pred, brooke, jack, stuart, supervisor, extAdvisors });
+  const supervisor      = document.getElementById('msv').value;
+  const extAdvisors     = document.getElementById('mex').value;
+  const brookeHrs       = parseInt(document.getElementById('mhbr').value)||0;
+  const jackHrs         = parseInt(document.getElementById('mhjk').value)||0;
+  const stuartHrs       = parseInt(document.getElementById('mhst').value)||0;
+  const supervisorHrs   = parseInt(document.getElementById('mhsv').value)||0;
+  const extAdvisorsHrs  = parseInt(document.getElementById('mhex').value)||0;
+  tasks.push({ id:nid++, group:mIsGrp, ms:mIsMs, cp, name, start, dur, pred, brooke, jack, stuart, supervisor, extAdvisors, brookeHrs, jackHrs, stuartHrs, supervisorHrs, extAdvisorsHrs });
   closeM(); render();
 }
 
 function exportCSV() {
-  const rows = [['#','Type','Name','Duration','Start','Finish','Predecessors','Critical Path','Brooke','Jack','Stuart','Supervisor','Ext. Advisors']];
+  const rows = [['#','Type','Name','Duration','Start','Finish','Predecessors','Critical Path','Brooke','Jack','Stuart','Supervisor','Ext. Advisors','Brooke Hrs','Jack Hrs','Stuart Hrs','Supervisor Hrs','Ext Hrs','Cost ($)']];
   tasks.forEach((t,i) => {
     const fin  = t.ms ? t.start : toS(addD(pd(t.start), t.dur));
     const type = t.ms ? 'Milestone' : t.group ? 'Group' : 'Task';
-    rows.push([i+1, type, t.name, t.ms?'0':t.dur+'d', t.start, fin, t.pred||'', t.cp?'Yes':'', t.brooke, t.jack, t.stuart, t.supervisor||'', t.extAdvisors||'']);
+    rows.push([i+1, type, t.name, t.ms?'0':t.dur+'d', t.start, fin, t.pred||'', t.cp?'Yes':'', t.brooke, t.jack, t.stuart, t.supervisor||'', t.extAdvisors||'', t.brookeHrs||0, t.jackHrs||0, t.stuartHrs||0, t.supervisorHrs||0, t.extAdvisorsHrs||0, taskCost(t)]);
   });
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
@@ -558,7 +588,7 @@ function exportCSV() {
 function copyData() {
   const lines = tasks.map(t => {
     const q = s => s ? `"${s.replace(/"/g,'\\"')}"` : '""';
-    return `  { id:${t.id}, group:${t.group}, ms:${t.ms}, cp:${t.cp}, name:${q(t.name)}, start:${q(t.start)}, dur:${t.dur}, pred:${q(t.pred||'')}, brooke:${q(t.brooke||'')}, jack:${q(t.jack||'')}, stuart:${q(t.stuart||'')}, supervisor:${q(t.supervisor||'')}, extAdvisors:${q(t.extAdvisors||'')} }`;
+    return `  { id:${t.id}, group:${t.group}, ms:${t.ms}, cp:${t.cp}, name:${q(t.name)}, start:${q(t.start)}, dur:${t.dur}, pred:${q(t.pred||'')}, brooke:${q(t.brooke||'')}, jack:${q(t.jack||'')}, stuart:${q(t.stuart||'')}, supervisor:${q(t.supervisor||'')}, extAdvisors:${q(t.extAdvisors||'')}, brookeHrs:${t.brookeHrs||0}, jackHrs:${t.jackHrs||0}, stuartHrs:${t.stuartHrs||0}, supervisorHrs:${t.supervisorHrs||0}, extAdvisorsHrs:${t.extAdvisorsHrs||0} }`;
   });
   const out = `const TASKS = [\n${lines.join(',\n')}\n];`;
   navigator.clipboard.writeText(out).then(() => {
