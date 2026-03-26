@@ -80,7 +80,10 @@
   .bleg.crit{background:linear-gradient(90deg,var(--critical),#ff6348);}
   .bleg.grp{background:linear-gradient(90deg,var(--gantt-group),#e03030);height:5px;margin:2.5px 0;}
   .main-wrapper{display:flex;overflow:hidden;height:calc(100vh - 90px);}
-  .left-panel{width:720px;flex-shrink:0;border-right:2px solid var(--border);overflow-y:auto;overflow-x:auto;}
+  .left-panel{width:720px;flex-shrink:0;overflow-y:auto;overflow-x:auto;}
+  .resizer{width:5px;flex-shrink:0;background:var(--border);cursor:col-resize;transition:background .15s;position:relative;z-index:10;}
+  .resizer:hover,.resizer.dragging{background:var(--accent);}
+  .resizer::after{content:'';position:absolute;inset:-4px 0;}
   .left-panel::-webkit-scrollbar{width:5px;}
   .left-panel::-webkit-scrollbar-thumb{background:var(--border);}
   .right-panel{flex:1;overflow:auto;position:relative;}
@@ -230,6 +233,7 @@
       <tbody id="tb"></tbody>
     </table>
   </div>
+  <div class="resizer" id="resizer"></div>
   <div class="right-panel" id="rp">
     <div id="gantt-scroll">
       <div class="gsw" id="gsw">
@@ -609,6 +613,28 @@ document.addEventListener('DOMContentLoaded', () => {
   let sy = false;
   lp.addEventListener('scroll', () => { if(sy)return; sy=true; rp.scrollTop=lp.scrollTop; sy=false; });
   rp.addEventListener('scroll', () => { if(sy)return; sy=true; lp.scrollTop=rp.scrollTop; sy=false; });
+
+  const resizer = document.getElementById('resizer');
+  resizer.addEventListener('mousedown', e => {
+    const startX = e.clientX, startW = lp.offsetWidth;
+    resizer.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    const onMove = ev => {
+      const w = Math.max(200, Math.min(startW + ev.clientX - startX, window.innerWidth - 200));
+      lp.style.width = w + 'px';
+    };
+    const onUp = () => {
+      resizer.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    e.preventDefault();
+  });
 });
 
 window.addEventListener('beforeprint', () => {
