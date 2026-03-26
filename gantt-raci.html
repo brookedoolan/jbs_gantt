@@ -113,7 +113,7 @@
   .rs.I{color:var(--i);background:rgba(54,217,160,.14);}
   .rs.X{color:var(--x);background:rgba(192,132,252,.14);}
   .rs.e{color:var(--text-muted);}
-  .thb{color:#a78bfa!important;}.thj{color:#60a5fa!important;}.ths{color:#34d399!important;}
+  .thb{color:#a78bfa!important;}.thj{color:#60a5fa!important;}.ths{color:#34d399!important;}.thsv{color:#f59e0b!important;}.thex{color:#f472b6!important;}
   .gsw{position:sticky;top:0;z-index:40;background:var(--header-bg);}
   .gm,.gw{display:flex;}
   .mc{border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--header-bg);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);padding:0 6px;display:flex;align-items:center;flex-shrink:0;height:24px;}
@@ -150,7 +150,7 @@
 <body>
 
 <div class="topbar">
-  <div class="topbar-title">GANTT <span>+</span> RACI &nbsp;·&nbsp; <span style="color:var(--text-muted);font-size:11px">Computationally Engineered Liquid Rocket Engine</span></div>
+  <div class="topbar-title">JBS Gantt Chart &nbsp;·&nbsp; <span style="color:var(--text-muted);font-size:11px">Computationally Engineered Liquid Rocket Engine</span></div>
   <div class="toolbar">
     <button class="btn primary" onclick="openM(false,false)">+ Task</button>
     <button class="btn" onclick="openM(true,false)">+ Group</button>
@@ -186,6 +186,8 @@
         <th style="width:44px" class="thb">Brooke</th>
         <th style="width:44px" class="thj">Jack</th>
         <th style="width:44px" class="ths">Stuart</th>
+        <th style="width:54px" class="thsv">Supervisor</th>
+        <th style="width:54px" class="thex">Ext. Advisors</th>
         <th style="width:26px"></th>
       </tr></thead>
       <tbody id="tb"></tbody>
@@ -218,6 +220,10 @@
       <div style="flex:1"><label>Jack</label><select id="mjk"><option value="">–</option><option>R</option><option>A</option><option>C</option><option>I</option><option>X</option></select></div>
       <div style="flex:1"><label>Stuart</label><select id="mst"><option value="">–</option><option>R</option><option>A</option><option>C</option><option>I</option><option>X</option></select></div>
     </div>
+    <div class="fr" style="flex-direction:row;gap:10px">
+      <div style="flex:1"><label>Supervisor</label><select id="msv"><option value="">–</option><option>R</option><option>A</option><option>C</option><option>I</option><option>X</option></select></div>
+      <div style="flex:1"><label>Ext. Advisors</label><select id="mex"><option value="">–</option><option>R</option><option>A</option><option>C</option><option>I</option><option>X</option></select></div>
+    </div>
     <div class="mf">
       <button class="btn" onclick="closeM()">Cancel</button>
       <button class="btn primary" onclick="saveM()">Save</button>
@@ -234,12 +240,11 @@
 const TASKS = [
 
   // ── PHASE 1: Project Scope & Architecture ──────────────────────────────
-  { id:1,  group:true,  ms:false, cp:false, name:"Project Scope & Architecture",           start:"2025-11-03", dur:20, pred:"",       brooke:"A",  jack:"R",  stuart:"" },
+  { id:1,  group:true,  ms:false, cp:false, name:"Project Scope & Architecture",           start:"2025-11-03", dur:20, pred:"",       brooke:"R",  jack:"A",  stuart:"R" },
   { id:2,  group:false, ms:false, cp:false, name:"Draft Initial Project Plan",             start:"2025-11-03", dur:20, pred:"",       brooke:"",   jack:"R",  stuart:"" },
   { id:3,  group:false, ms:false, cp:false, name:"AM Sponsor Sourcing",                    start:"2025-11-03", dur:20, pred:"",       brooke:"",   jack:"R",  stuart:"" },
-  { id:4,  group:false, ms:false, cp:true,  name:"Project Scope Defined",                  start:"2025-11-03", dur:20, pred:"",       brooke:"R",  jack:"",   stuart:"" },
-  { id:5,  group:false, ms:false, cp:false, name:"Race2Space Submission",                  start:"2025-10-11", dur:10, pred:"",       brooke:"",   jack:"R",  stuart:"" },
-  { id:51, group:false, ms:true,  cp:true,  name:"◆ Project scope & architecture defined", start:"2025-11-24", dur:0,  pred:"4",      brooke:"A",  jack:"R",  stuart:"" },
+  { id:5,  group:false, ms:false, cp:false, name:"◆ Race2Space EOI Submission",                  start:"2025-11-04", dur:0, pred:"",       brooke:"",   jack:"R",  stuart:"" },
+  { id:51, group:false, ms:true,  cp:true,  name:"◆ Final Project scope & architecture defined", start:"2025-11-24", dur:0,  pred:"4",      brooke:"A",  jack:"R",  stuart:"" },
 
   // ── PHASE 2: Initial Engine Design ────────────────────────────────────
   { id:6,  group:true,  ms:false, cp:true,  name:"Initial Engine Design",                  start:"2025-11-24", dur:30, pred:"51",     brooke:"A",  jack:"C",  stuart:"R" },
@@ -362,6 +367,8 @@ function renderL() {
       <td class="rc">${rsel(t.id,'brooke',t.brooke)}</td>
       <td class="rc">${rsel(t.id,'jack',t.jack)}</td>
       <td class="rc">${rsel(t.id,'stuart',t.stuart)}</td>
+      <td class="rc">${rsel(t.id,'supervisor',t.supervisor)}</td>
+      <td class="rc">${rsel(t.id,'extAdvisors',t.extAdvisors)}</td>
       <td><button class="btn danger" style="padding:1px 5px;font-size:10px" onclick="del(${t.id})">✕</button></td>
     `;
     tb.appendChild(tr);
@@ -497,6 +504,7 @@ function openM(grp, ms) {
   document.getElementById('mp').value='';
   document.getElementById('mcp').checked=false;
   document.getElementById('mbr').value=''; document.getElementById('mjk').value=''; document.getElementById('mst').value='';
+  document.getElementById('msv').value=''; document.getElementById('mex').value='';
   document.getElementById('drow').style.display = ms?'none':'flex';
   document.getElementById('modal').classList.add('open');
 }
@@ -507,19 +515,21 @@ function saveM() {
   const dur    = mIsMs ? 0 : (parseInt(document.getElementById('md').value)||14);
   const pred   = document.getElementById('mp').value.trim();
   const cp     = document.getElementById('mcp').checked;
-  const brooke = document.getElementById('mbr').value;
-  const jack   = document.getElementById('mjk').value;
-  const stuart = document.getElementById('mst').value;
-  tasks.push({ id:nid++, group:mIsGrp, ms:mIsMs, cp, name, start, dur, pred, brooke, jack, stuart });
+  const brooke      = document.getElementById('mbr').value;
+  const jack        = document.getElementById('mjk').value;
+  const stuart      = document.getElementById('mst').value;
+  const supervisor  = document.getElementById('msv').value;
+  const extAdvisors = document.getElementById('mex').value;
+  tasks.push({ id:nid++, group:mIsGrp, ms:mIsMs, cp, name, start, dur, pred, brooke, jack, stuart, supervisor, extAdvisors });
   closeM(); render();
 }
 
 function exportCSV() {
-  const rows = [['#','Type','Name','Duration','Start','Finish','Predecessors','Critical Path','Brooke','Jack','Stuart']];
+  const rows = [['#','Type','Name','Duration','Start','Finish','Predecessors','Critical Path','Brooke','Jack','Stuart','Supervisor','Ext. Advisors']];
   tasks.forEach((t,i) => {
     const fin  = t.ms ? t.start : toS(addD(pd(t.start), t.dur));
     const type = t.ms ? 'Milestone' : t.group ? 'Group' : 'Task';
-    rows.push([i+1, type, t.name, t.ms?'0':t.dur+'d', t.start, fin, t.pred||'', t.cp?'Yes':'', t.brooke, t.jack, t.stuart]);
+    rows.push([i+1, type, t.name, t.ms?'0':t.dur+'d', t.start, fin, t.pred||'', t.cp?'Yes':'', t.brooke, t.jack, t.stuart, t.supervisor||'', t.extAdvisors||'']);
   });
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
@@ -530,7 +540,7 @@ function exportCSV() {
 function copyData() {
   const lines = tasks.map(t => {
     const q = s => s ? `"${s.replace(/"/g,'\\"')}"` : '""';
-    return `  { id:${t.id}, group:${t.group}, ms:${t.ms}, cp:${t.cp}, name:${q(t.name)}, start:${q(t.start)}, dur:${t.dur}, pred:${q(t.pred||'')}, brooke:${q(t.brooke||'')}, jack:${q(t.jack||'')}, stuart:${q(t.stuart||'')} }`;
+    return `  { id:${t.id}, group:${t.group}, ms:${t.ms}, cp:${t.cp}, name:${q(t.name)}, start:${q(t.start)}, dur:${t.dur}, pred:${q(t.pred||'')}, brooke:${q(t.brooke||'')}, jack:${q(t.jack||'')}, stuart:${q(t.stuart||'')}, supervisor:${q(t.supervisor||'')}, extAdvisors:${q(t.extAdvisors||'')} }`;
   });
   const out = `const TASKS = [\n${lines.join(',\n')}\n];`;
   navigator.clipboard.writeText(out).then(() => {
