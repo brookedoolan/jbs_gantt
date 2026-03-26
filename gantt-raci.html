@@ -3,12 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gantt + RACI — Computationally Engineered Liquid Rocket Engine</title>
+<title>JBS Gantt Chart — Computationally Engineered Liquid Rocket Engine</title>
+
+<!-- ============================================================
+  COMPUTATIONALLY ENGINEERED LIQUID ROCKET ENGINE
+  Gantt + RACIX Chart  |  ENGR90037 Capstone 2026
+
+  HOW TO EDIT THIS FILE
+  ─────────────────────
+  All project data lives in the DATA SECTION below (search for
+  "DATA SECTION START"). Everything else is rendering code —
+  you should not need to touch it.
+
+  TASK FIELDS:
+    id       – unique number, never repeat or change
+    group    – true = phase/group header row (shown in red)
+    ms       – true = milestone (shown as ◆ diamond, dur = 0)
+    cp       – true = on the Critical Path (shown in orange)
+    name     – display name
+    start    – "YYYY-MM-DD"
+    dur      – duration in days (set 0 for milestones)
+    pred     – predecessor row numbers, comma-separated e.g. "3,5"
+               (display only — used for reference, not auto-scheduling)
+    brooke   – RACIX role: "R", "A", "C", "I", "X", or ""
+    jack     – same
+    stuart   – same
+
+  RACIX ROLES:
+    R  Responsible  – does the work
+    A  Accountable  – owns the outcome, single point of accountability
+    C  Consulted    – provides input before/during
+    I  Informed     – kept in the loop after decisions
+    X  Signoff      – approves / signs off the deliverable
+
+  TO ADD A TASK: copy any existing task line, give it a new id,
+                 and add it in the right position in the array.
+
+  TO ADD A MILESTONE: set ms:true, dur:0.
+
+  TO MARK CRITICAL PATH: set cp:true.
+  ============================================================ -->
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
   :root {
     --bg:#0c0e16; --surface2:#1a1f30; --border:#252d45;
-    --accent:#4f7cff; --accent2:#ff5e5e; --accent3:#36d9a0;
+    --accent:#4f7cff; --accent2:#ff5e5e;
     --text:#dde1f0; --text-muted:#5a6385;
     --gantt-task:#3d6fff; --gantt-task2:#6b4fff;
     --gantt-group:#ff5e5e; --critical:#ff9f43;
@@ -18,8 +58,6 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;min-height:100vh;}
-
-  /* TOPBAR */
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;background:var(--header-bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;gap:12px;flex-wrap:wrap;}
   .topbar-title{font-family:'Space Mono',monospace;font-size:12px;white-space:nowrap;}
   .topbar-title span{color:var(--accent);}
@@ -29,8 +67,6 @@
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
   .btn.danger{background:#3a1a1a;border-color:var(--accent2);color:var(--accent2);}
   .btn.danger:hover{background:var(--accent2);color:#fff;}
-
-  /* LEGEND */
   .legend{display:flex;gap:14px;padding:7px 18px;background:var(--header-bg);border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;}
   .li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);}
   .badge{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:4px;font-size:10px;font-weight:700;font-family:'Space Mono',monospace;}
@@ -43,8 +79,6 @@
   .bleg{width:22px;height:10px;border-radius:3px;background:linear-gradient(90deg,var(--gantt-task),var(--gantt-task2));display:inline-block;}
   .bleg.crit{background:linear-gradient(90deg,var(--critical),#ff6348);}
   .bleg.grp{background:linear-gradient(90deg,var(--gantt-group),#e03030);height:5px;margin:2.5px 0;}
-
-  /* LAYOUT */
   .main-wrapper{display:flex;overflow:hidden;height:calc(100vh - 90px);}
   .left-panel{min-width:720px;flex-shrink:0;border-right:2px solid var(--border);overflow-y:auto;overflow-x:hidden;}
   .left-panel::-webkit-scrollbar{width:5px;}
@@ -52,8 +86,7 @@
   .right-panel{flex:1;overflow:auto;position:relative;}
   .right-panel::-webkit-scrollbar{width:6px;height:6px;}
   .right-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-
-  /* TABLE */
+  #gantt-scroll{display:inline-block;min-width:100%;}
   table{border-collapse:collapse;width:100%;}
   th{background:var(--header-bg);color:var(--text-muted);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:50;}
   td{padding:4px 8px;border-bottom:1px solid var(--grid-line);border-right:1px solid var(--grid-line);vertical-align:middle;white-space:nowrap;height:var(--row-h);}
@@ -81,37 +114,25 @@
   .rs.X{color:var(--x);background:rgba(192,132,252,.14);}
   .rs.e{color:var(--text-muted);}
   .thb{color:#a78bfa!important;}.thj{color:#60a5fa!important;}.ths{color:#34d399!important;}
-
-  /* GANTT HEADER */
   .gsw{position:sticky;top:0;z-index:40;background:var(--header-bg);}
-  .gm,.gw{display:flex;overflow:hidden;}
+  .gm,.gw{display:flex;}
   .mc{border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--header-bg);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);padding:0 6px;display:flex;align-items:center;flex-shrink:0;height:24px;}
   .wc{border-right:1px solid var(--grid-line);border-bottom:1px solid var(--border);background:var(--header-bg);font-size:9px;font-family:'Space Mono',monospace;color:var(--text-muted);padding:0 1px;display:flex;align-items:center;justify-content:center;flex-shrink:0;height:22px;}
   .wc.tw{border-left:2px solid var(--accent2);color:var(--accent2);}
-
-  /* GANTT BODY */
   .gbody{position:relative;}
   .gr{display:flex;height:var(--row-h);border-bottom:1px solid var(--grid-line);position:relative;align-items:center;}
   .gr:hover{background:var(--row-hover);}
   .gc{height:100%;border-right:1px solid var(--grid-line);flex-shrink:0;position:relative;}
   .gc.tc{background:rgba(255,94,94,.022);}
-
-  /* BARS */
   .bar{position:absolute;border-radius:3px;display:flex;align-items:center;font-size:9px;font-weight:600;color:rgba(255,255,255,.8);overflow:hidden;padding-left:5px;cursor:grab;transition:filter .12s,transform .1s;white-space:nowrap;}
   .bar:hover{filter:brightness(1.18);transform:scaleY(1.07);z-index:5;}
   .bar.task{top:6px;height:19px;background:linear-gradient(90deg,var(--gantt-task),var(--gantt-task2));}
   .bar.grp{top:13px;height:6px;border-radius:2px;background:linear-gradient(90deg,var(--gantt-group),#e03030);}
   .bar.crit{background:linear-gradient(90deg,var(--critical),#ff6348)!important;}
-
-  /* MILESTONE DIAMOND */
-  .md{position:absolute;width:14px;height:14px;background:#0a0c14;border:2.5px solid #dde1f0;transform:rotate(45deg);top:50%;margin-top:-7px;cursor:default;z-index:10;transition:border-color .15s,transform .15s;flex-shrink:0;}
+  .md{position:absolute;width:14px;height:14px;background:#0a0c14;border:2.5px solid #dde1f0;transform:rotate(45deg);top:50%;margin-top:-7px;cursor:default;z-index:10;transition:border-color .15s,transform .15s;}
   .md:hover{border-color:var(--accent);transform:rotate(45deg) scale(1.3);}
   .ml{position:absolute;font-size:9px;color:#9aa;white-space:nowrap;top:50%;transform:translateY(-50%);pointer-events:none;font-family:'DM Sans',sans-serif;font-style:italic;}
-
-  /* TODAY LINE */
   .tl{position:absolute;top:0;bottom:0;width:2px;background:var(--accent2);opacity:.6;pointer-events:none;z-index:20;}
-
-  /* MODAL */
   .mb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.76);z-index:300;align-items:center;justify-content:center;}
   .mb.open{display:flex;}
   .modal{background:#161b2b;border:1px solid var(--border);border-radius:10px;padding:22px;width:440px;max-width:95vw;}
@@ -147,7 +168,7 @@
   <div class="li" style="margin-left:8px"><div class="dleg"></div> Milestone</div>
   <div class="li"><div class="bleg"></div> Task</div>
   <div class="li"><div class="bleg crit"></div> Critical Path</div>
-  <div class="li"><div class="bleg grp"></div> Group/Phase</div>
+  <div class="li"><div class="bleg grp"></div> Group / Phase</div>
   <div class="li" style="margin-left:auto;font-size:10.5px;color:var(--text-muted)">Click cells to edit · Drag bars · Red line = today</div>
 </div>
 
@@ -169,24 +190,25 @@
       <tbody id="tb"></tbody>
     </table>
   </div>
-
   <div class="right-panel" id="rp">
-    <div class="gsw" id="ghdr">
-      <div class="gm" id="gmonths"></div>
-      <div class="gw" id="gweeks"></div>
-    </div>
-    <div class="gbody" id="gbody">
-      <div class="tl" id="tline"></div>
+    <div id="gantt-scroll">
+      <div class="gsw" id="gsw">
+        <div class="gm" id="gmonths"></div>
+        <div class="gw" id="gweeks"></div>
+      </div>
+      <div class="gbody" id="gbody">
+        <div class="tl" id="tline"></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- ADD / EDIT MODAL -->
 <div class="mb" id="modal">
   <div class="modal">
     <h2 id="mtitle">Add Task</h2>
-    <div class="fr"><label>Name</label><input id="mn" placeholder="Name"></div>
-    <div class="fr"><label>Date</label><input id="ms" type="date"></div>
+    <div class="fr"><label>Name</label><input id="mn" placeholder="Task name"></div>
+    <div class="fr"><label>Date</label><input id="ms_in" type="date"></div>
     <div id="drow" class="fr"><label>Duration (days)</label><input id="md" type="number" min="1" value="14"></div>
     <div class="fr"><label>Predecessor row #s (comma-separated)</label><input id="mp" placeholder="e.g. 3,5"></div>
     <div class="ckr"><label><input type="checkbox" id="mcp"> Critical Path</label></div>
@@ -203,96 +225,129 @@
 </div>
 
 <script>
-let tasks=[
-  {id:1, group:true, ms:false, cp:false, name:"Project Scope & Architecture",        start:"2025-11-03",dur:15,pred:"",     brooke:"A",jack:"R",stuart:""},
-  {id:2, group:false,ms:false, cp:false, name:"Draft Initial Project Plan",           start:"2025-11-03",dur:15,pred:"",     brooke:"",jack:"R",stuart:""},
-  {id:3, group:false,ms:false, cp:false, name:"AM Sponsor Sourcing",                  start:"2025-11-03",dur:15,pred:"",     brooke:"",jack:"R",stuart:""},
-  {id:4, group:false,ms:false, cp:true,  name:"Project Scope Defined",                start:"2025-11-03",dur:15,pred:"",     brooke:"R",jack:"",stuart:""},
-  {id:5, group:false,ms:false, cp:false, name:"Race2Space Submission",                start:"2025-10-11",dur:10,pred:"",     brooke:"",jack:"R",stuart:""},
-  {id:51,group:false,ms:true,  cp:true,  name:"Project scope & architecture defined", start:"2025-11-24",dur:0, pred:"4",   brooke:"A",jack:"R",stuart:""},
-  {id:6, group:true, ms:false, cp:true,  name:"Initial Engine Design",                start:"2025-11-24",dur:30,pred:"51",  brooke:"A",jack:"C",stuart:"R"},
-  {id:7, group:false,ms:false, cp:true,  name:"Prelim. Geom. Chamber",                start:"2025-11-24",dur:30,pred:"51",  brooke:"",jack:"",stuart:"R"},
-  {id:8, group:false,ms:false, cp:true,  name:"Prelim. Geom. Injector",               start:"2025-11-24",dur:30,pred:"51",  brooke:"",jack:"R",stuart:""},
-  {id:9, group:false,ms:false, cp:false, name:"RPA Engine Geometry, 1D",              start:"2025-11-24",dur:30,pred:"51",  brooke:"R",jack:"",stuart:""},
-  {id:10,group:false,ms:false, cp:false, name:"Thrust Structure Design",              start:"2025-11-24",dur:30,pred:"51",  brooke:"R",jack:"",stuart:""},
-  {id:11,group:false,ms:false, cp:true,  name:"PDR Report",                           start:"2025-12-20",dur:10,pred:"7,8", brooke:"A",jack:"C",stuart:"C"},
-  {id:52,group:false,ms:true,  cp:true,  name:"Initial geometry & prelim. calcs done",start:"2026-01-01",dur:0, pred:"11",  brooke:"A",jack:"C",stuart:"R"},
-  {id:53,group:false,ms:true,  cp:true,  name:"PDR submitted to Race2Space",          start:"2026-01-04",dur:0, pred:"11",  brooke:"A",jack:"X",stuart:"X"},
-  {id:12,group:true, ms:false, cp:false, name:"Water Flow Testing & Analysis",        start:"2026-01-05",dur:63,pred:"53",  brooke:"",jack:"C",stuart:"C"},
-  {id:13,group:false,ms:false, cp:false, name:"Preliminary Injector Sampling",        start:"2026-01-05",dur:30,pred:"53",  brooke:"",jack:"I",stuart:"I"},
-  {id:14,group:false,ms:false, cp:false, name:"Samples Post-Processing",              start:"2026-02-16",dur:9, pred:"13",  brooke:"",jack:"R",stuart:"C"},
-  {id:15,group:false,ms:false, cp:false, name:"Water Flow Test Stand Mfg",            start:"2026-02-14",dur:9, pred:"13",  brooke:"",jack:"R",stuart:""},
-  {id:16,group:false,ms:false, cp:false, name:"DAQ Hardware & Software",              start:"2026-02-14",dur:14,pred:"13",  brooke:"R",jack:"",stuart:""},
-  {id:17,group:false,ms:false, cp:false, name:"Prelim. Water Flow Testing",           start:"2026-03-05",dur:10,pred:"15",  brooke:"A",jack:"R",stuart:""},
-  {id:18,group:false,ms:false, cp:false, name:"Secondary Water Flow Testing",         start:"2026-03-19",dur:9, pred:"17",  brooke:"A",jack:"R",stuart:""},
-  {id:19,group:true, ms:false, cp:true,  name:"Stage 1 BRUV – 1D Optimiser",         start:"2026-01-05",dur:61,pred:"53",  brooke:"C",jack:"",stuart:"R"},
-  {id:20,group:false,ms:false, cp:true,  name:"1D Optimiser for Chamber",             start:"2026-01-05",dur:61,pred:"53",  brooke:"",jack:"",stuart:"R"},
-  {id:21,group:false,ms:false, cp:false, name:"1D Thermal and Stress Model",          start:"2026-01-05",dur:61,pred:"53",  brooke:"R",jack:"",stuart:""},
-  {id:54,group:false,ms:true,  cp:true,  name:"1D CEM optimiser validated vs literature",start:"2026-04-10",dur:0,pred:"20",brooke:"C",jack:"",stuart:"R"},
-  {id:22,group:true, ms:false, cp:true,  name:"Final Engine Design",                  start:"2026-02-04",dur:12,pred:"54",  brooke:"A",jack:"C",stuart:"R"},
-  {id:23,group:false,ms:false, cp:true,  name:"Final Chamber Design",                 start:"2026-02-04",dur:10,pred:"54",  brooke:"",jack:"",stuart:"R"},
-  {id:24,group:false,ms:false, cp:true,  name:"Final Injector Design",                start:"2026-02-04",dur:10,pred:"54",  brooke:"",jack:"R",stuart:""},
-  {id:25,group:false,ms:false, cp:false, name:"Final Thrust Structure",               start:"2026-02-04",dur:10,pred:"54",  brooke:"R",jack:"",stuart:""},
-  {id:26,group:false,ms:false, cp:false, name:"Race2Space Test Plan",                 start:"2026-02-04",dur:10,pred:"54",  brooke:"R",jack:"",stuart:""},
-  {id:27,group:false,ms:false, cp:false, name:"CDR Report",                           start:"2026-02-07",dur:9, pred:"54",  brooke:"A",jack:"C",stuart:"C"},
-  {id:55,group:false,ms:true,  cp:true,  name:"Engine design lock — print file to CSIRO",start:"2026-04-12",dur:0,pred:"23,24",brooke:"A",jack:"X",stuart:"X"},
-  {id:56,group:false,ms:true,  cp:true,  name:"CDR submitted to Race2Space",          start:"2026-04-19",dur:0, pred:"27",  brooke:"A",jack:"X",stuart:"X"},
-  {id:28,group:true, ms:false, cp:true,  name:"Engine Manufacture & Assembly",        start:"2026-04-16",dur:45,pred:"55",  brooke:"C",jack:"I",stuart:"I"},
-  {id:29,group:false,ms:false, cp:true,  name:"Final Engine Printed by CSIRO",        start:"2026-04-16",dur:26,pred:"55",  brooke:"I",jack:"",stuart:"I"},
-  {id:30,group:false,ms:false, cp:false, name:"Thrust Structure Manufacture",         start:"2026-04-16",dur:26,pred:"55",  brooke:"R",jack:"",stuart:""},
-  {id:31,group:false,ms:false, cp:false, name:"Procurement of Fittings",              start:"2026-04-20",dur:26,pred:"55",  brooke:"",jack:"R",stuart:""},
-  {id:32,group:false,ms:false, cp:false, name:"AM Parts Delivered to Mfg",            start:"2026-04-25",dur:11,pred:"29",  brooke:"R",jack:"",stuart:""},
-  {id:33,group:false,ms:false, cp:true,  name:"Final Engine Assembly",                start:"2026-06-09",dur:7, pred:"29,30,31",brooke:"",jack:"R",stuart:"R"},
-  {id:57,group:false,ms:true,  cp:true,  name:"Post-processing & assembly complete",  start:"2026-06-24",dur:0, pred:"33",  brooke:"A",jack:"R",stuart:"R"},
-  {id:34,group:true, ms:false, cp:true,  name:"Engine Testing at Race2Space",         start:"2026-07-05",dur:6, pred:"57",  brooke:"A",jack:"R",stuart:"R"},
-  {id:35,group:false,ms:false, cp:true,  name:"Cold Flow & Hot Fire Testing",         start:"2026-07-05",dur:6, pred:"57",  brooke:"A",jack:"R",stuart:"R"},
-  {id:36,group:false,ms:false, cp:true,  name:"Data Analysis and CEM Refinement",    start:"2026-07-09",dur:16,pred:"35",  brooke:"C",jack:"",stuart:"R"},
-  {id:58,group:false,ms:true,  cp:true,  name:"Engine testing at Race2Space complete",start:"2026-07-10",dur:0, pred:"35",  brooke:"A",jack:"X",stuart:"X"},
-  {id:37,group:true, ms:false, cp:true,  name:"Stage 2 BRUV – 3D Optimiser",         start:"2026-03-31",dur:139,pred:"54", brooke:"",jack:"R",stuart:"R"},
-  {id:38,group:false,ms:false, cp:true,  name:"FEA Model Research & Dev",             start:"2026-03-31",dur:132,pred:"54", brooke:"",jack:"R",stuart:""},
-  {id:39,group:false,ms:false, cp:true,  name:"CFD Model Research & Dev",             start:"2026-03-31",dur:132,pred:"54", brooke:"",jack:"",stuart:"R"},
-  {id:40,group:false,ms:false, cp:false, name:"Optimiser GUI",                        start:"2026-02-09",dur:243,pred:"54", brooke:"R",jack:"",stuart:""},
-  {id:59,group:false,ms:true,  cp:true,  name:"Thermal modelling & CFD/FEA in optimiser",start:"2026-09-20",dur:0,pred:"38,39",brooke:"",jack:"R",stuart:"R"},
-  {id:60,group:false,ms:true,  cp:false, name:"Cold-flow experimental data collected",start:"2026-09-30",dur:0, pred:"36",  brooke:"A",jack:"",stuart:"R"},
-  {id:61,group:false,ms:true,  cp:true,  name:"Final CEM validation & UQ completed",  start:"2026-10-10",dur:0, pred:"59,60",brooke:"A",jack:"R",stuart:"R"},
-  {id:62,group:false,ms:true,  cp:false, name:"GUI for optimiser completed",           start:"2026-10-10",dur:0, pred:"40",  brooke:"A",jack:"",stuart:""},
-  {id:41,group:true, ms:false, cp:false, name:"Unimelb Capstone Assessment",          start:"2026-01-10",dur:13,pred:"",     brooke:"R",jack:"C",stuart:""},
-  {id:42,group:false,ms:false, cp:false, name:"Draft Capstone Report",                start:"2026-01-10",dur:4, pred:"",     brooke:"R",jack:"C",stuart:""},
-  {id:44,group:false,ms:false, cp:false, name:"Endeavour Preparation",                start:"2026-01-10",dur:13,pred:"",     brooke:"R",jack:"C",stuart:""},
-  {id:63,group:false,ms:true,  cp:false, name:"Draft Capstone report completed",      start:"2026-10-16",dur:0, pred:"42",   brooke:"R",jack:"C",stuart:""},
-  {id:43,group:false,ms:false, cp:true,  name:"Final Capstone Report (write-up)",     start:"2026-10-16",dur:2, pred:"61",   brooke:"R",jack:"C",stuart:""},
-  {id:64,group:false,ms:true,  cp:true,  name:"Final Capstone report submitted — S2 Wk12",start:"2026-10-23",dur:0,pred:"43",brooke:"R",jack:"X",stuart:"X"},
-  {id:65,group:false,ms:true,  cp:true,  name:"Oral Presentation / Exam",             start:"2026-11-13",dur:0, pred:"64",  brooke:"R",jack:"R",stuart:"R"},
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║                        DATA SECTION START                               ║
+// ║  Edit tasks here. Do not edit anything below "DATA SECTION END".        ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+const TASKS = [
+
+  // ── PHASE 1: Project Scope & Architecture ──────────────────────────────
+  { id:1,  group:true,  ms:false, cp:false, name:"Project Scope & Architecture",           start:"2025-11-03", dur:15, pred:"",       brooke:"A",  jack:"R",  stuart:"" },
+  { id:2,  group:false, ms:false, cp:false, name:"Draft Initial Project Plan",             start:"2025-11-03", dur:15, pred:"",       brooke:"",   jack:"R",  stuart:"" },
+  { id:3,  group:false, ms:false, cp:false, name:"AM Sponsor Sourcing",                    start:"2025-11-03", dur:15, pred:"",       brooke:"",   jack:"R",  stuart:"" },
+  { id:4,  group:false, ms:false, cp:true,  name:"Project Scope Defined",                  start:"2025-11-03", dur:15, pred:"",       brooke:"R",  jack:"",   stuart:"" },
+  { id:5,  group:false, ms:false, cp:false, name:"Race2Space Submission",                  start:"2025-10-11", dur:10, pred:"",       brooke:"",   jack:"R",  stuart:"" },
+  { id:51, group:false, ms:true,  cp:true,  name:"◆ Project scope & architecture defined", start:"2025-11-24", dur:0,  pred:"4",      brooke:"A",  jack:"R",  stuart:"" },
+
+  // ── PHASE 2: Initial Engine Design ────────────────────────────────────
+  { id:6,  group:true,  ms:false, cp:true,  name:"Initial Engine Design",                  start:"2025-11-24", dur:30, pred:"51",     brooke:"A",  jack:"C",  stuart:"R" },
+  { id:7,  group:false, ms:false, cp:true,  name:"Prelim. Geom. Chamber",                  start:"2025-11-24", dur:30, pred:"51",     brooke:"",   jack:"",   stuart:"R" },
+  { id:8,  group:false, ms:false, cp:true,  name:"Prelim. Geom. Injector",                 start:"2025-11-24", dur:30, pred:"51",     brooke:"",   jack:"R",  stuart:"" },
+  { id:9,  group:false, ms:false, cp:false, name:"RPA Engine Geometry, 1D",                start:"2025-11-24", dur:30, pred:"51",     brooke:"R",  jack:"",   stuart:"" },
+  { id:10, group:false, ms:false, cp:false, name:"Thrust Structure Design",                start:"2025-11-24", dur:30, pred:"51",     brooke:"R",  jack:"",   stuart:"" },
+  { id:11, group:false, ms:false, cp:true,  name:"PDR Report",                             start:"2025-12-20", dur:10, pred:"7,8",    brooke:"A",  jack:"C",  stuart:"C" },
+  { id:52, group:false, ms:true,  cp:true,  name:"◆ Initial geometry & prelim. calcs done",start:"2026-01-01", dur:0,  pred:"11",     brooke:"A",  jack:"C",  stuart:"R" },
+  { id:53, group:false, ms:true,  cp:true,  name:"◆ PDR submitted to Race2Space",          start:"2026-01-04", dur:0,  pred:"11",     brooke:"A",  jack:"X",  stuart:"X" },
+
+  // ── PHASE 3: Water Flow Testing ────────────────────────────────────────
+  { id:12, group:true,  ms:false, cp:false, name:"Water Flow Testing & Analysis",          start:"2026-01-05", dur:63, pred:"53",     brooke:"",   jack:"C",  stuart:"C" },
+  { id:13, group:false, ms:false, cp:false, name:"Preliminary Injector Sampling",          start:"2026-01-05", dur:30, pred:"53",     brooke:"",   jack:"I",  stuart:"I" },
+  { id:14, group:false, ms:false, cp:false, name:"Samples Post-Processing",                start:"2026-02-16", dur:9,  pred:"13",     brooke:"",   jack:"R",  stuart:"C" },
+  { id:15, group:false, ms:false, cp:false, name:"Water Flow Test Stand Mfg",              start:"2026-02-14", dur:9,  pred:"13",     brooke:"",   jack:"R",  stuart:"" },
+  { id:16, group:false, ms:false, cp:false, name:"DAQ Hardware & Software",                start:"2026-02-14", dur:14, pred:"13",     brooke:"R",  jack:"",   stuart:"" },
+  { id:17, group:false, ms:false, cp:false, name:"Prelim. Water Flow Testing",             start:"2026-03-05", dur:10, pred:"15",     brooke:"A",  jack:"R",  stuart:"" },
+  { id:18, group:false, ms:false, cp:false, name:"Secondary Water Flow Testing",           start:"2026-03-19", dur:9,  pred:"17",     brooke:"A",  jack:"R",  stuart:"" },
+
+  // ── PHASE 4: Stage 1 BRUV – 1D Optimiser ─────────────────────────────
+  { id:19, group:true,  ms:false, cp:true,  name:"Stage 1 BRUV – 1D Optimiser",           start:"2026-01-05", dur:61, pred:"53",     brooke:"C",  jack:"",   stuart:"R" },
+  { id:20, group:false, ms:false, cp:true,  name:"1D Optimiser for Chamber",               start:"2026-01-05", dur:61, pred:"53",     brooke:"",   jack:"",   stuart:"R" },
+  { id:21, group:false, ms:false, cp:false, name:"1D Thermal and Stress Model",            start:"2026-01-05", dur:61, pred:"53",     brooke:"R",  jack:"",   stuart:"" },
+  { id:54, group:false, ms:true,  cp:true,  name:"◆ 1D CEM optimiser validated vs literature", start:"2026-04-10", dur:0, pred:"20", brooke:"C",  jack:"",   stuart:"R" },
+
+  // ── PHASE 5: Final Engine Design ──────────────────────────────────────
+  { id:22, group:true,  ms:false, cp:true,  name:"Final Engine Design",                    start:"2026-02-04", dur:12, pred:"54",     brooke:"A",  jack:"C",  stuart:"R" },
+  { id:23, group:false, ms:false, cp:true,  name:"Final Chamber Design",                   start:"2026-02-04", dur:10, pred:"54",     brooke:"",   jack:"",   stuart:"R" },
+  { id:24, group:false, ms:false, cp:true,  name:"Final Injector Design",                  start:"2026-02-04", dur:10, pred:"54",     brooke:"",   jack:"R",  stuart:"" },
+  { id:25, group:false, ms:false, cp:false, name:"Final Thrust Structure",                 start:"2026-02-04", dur:10, pred:"54",     brooke:"R",  jack:"",   stuart:"" },
+  { id:26, group:false, ms:false, cp:false, name:"Race2Space Test Plan",                   start:"2026-02-04", dur:10, pred:"54",     brooke:"R",  jack:"",   stuart:"" },
+  { id:27, group:false, ms:false, cp:false, name:"CDR Report",                             start:"2026-02-07", dur:9,  pred:"54",     brooke:"A",  jack:"C",  stuart:"C" },
+  { id:55, group:false, ms:true,  cp:true,  name:"◆ Engine design lock — print file to CSIRO", start:"2026-04-12", dur:0, pred:"23,24", brooke:"A", jack:"X", stuart:"X" },
+  { id:56, group:false, ms:true,  cp:true,  name:"◆ CDR submitted to Race2Space",          start:"2026-04-19", dur:0,  pred:"27",     brooke:"A",  jack:"X",  stuart:"X" },
+
+  // ── PHASE 6: Engine Manufacture & Assembly ────────────────────────────
+  { id:28, group:true,  ms:false, cp:true,  name:"Engine Manufacture & Assembly",          start:"2026-04-16", dur:45, pred:"55",     brooke:"C",  jack:"I",  stuart:"I" },
+  { id:29, group:false, ms:false, cp:true,  name:"Final Engine Printed by CSIRO",          start:"2026-04-16", dur:26, pred:"55",     brooke:"I",  jack:"",   stuart:"I" },
+  { id:30, group:false, ms:false, cp:false, name:"Thrust Structure Manufacture",           start:"2026-04-16", dur:26, pred:"55",     brooke:"R",  jack:"",   stuart:"" },
+  { id:31, group:false, ms:false, cp:false, name:"Procurement of Fittings",                start:"2026-04-20", dur:26, pred:"55",     brooke:"",   jack:"R",  stuart:"" },
+  { id:32, group:false, ms:false, cp:false, name:"AM Parts Delivered to Mfg",              start:"2026-04-25", dur:11, pred:"29",     brooke:"R",  jack:"",   stuart:"" },
+  { id:33, group:false, ms:false, cp:true,  name:"Final Engine Assembly",                  start:"2026-06-09", dur:7,  pred:"29,30,31",brooke:"",  jack:"R",  stuart:"R" },
+  { id:57, group:false, ms:true,  cp:true,  name:"◆ Post-processing & assembly complete",  start:"2026-06-24", dur:0,  pred:"33",     brooke:"A",  jack:"R",  stuart:"R" },
+
+  // ── PHASE 7: Engine Testing ───────────────────────────────────────────
+  { id:34, group:true,  ms:false, cp:true,  name:"Engine Testing at Race2Space",           start:"2026-07-05", dur:6,  pred:"57",     brooke:"A",  jack:"R",  stuart:"R" },
+  { id:35, group:false, ms:false, cp:true,  name:"Cold Flow & Hot Fire Testing",           start:"2026-07-05", dur:6,  pred:"57",     brooke:"A",  jack:"R",  stuart:"R" },
+  { id:36, group:false, ms:false, cp:true,  name:"Data Analysis and CEM Refinement",      start:"2026-07-09", dur:16, pred:"35",     brooke:"C",  jack:"",   stuart:"R" },
+  { id:58, group:false, ms:true,  cp:true,  name:"◆ Engine testing at Race2Space complete",start:"2026-07-10", dur:0,  pred:"35",     brooke:"A",  jack:"X",  stuart:"X" },
+
+  // ── PHASE 8: Stage 2 BRUV – 3D Optimiser ─────────────────────────────
+  { id:37, group:true,  ms:false, cp:true,  name:"Stage 2 BRUV – 3D Optimiser",           start:"2026-03-31", dur:139,pred:"54",     brooke:"",   jack:"R",  stuart:"R" },
+  { id:38, group:false, ms:false, cp:true,  name:"FEA Model Research & Dev",               start:"2026-03-31", dur:132,pred:"54",     brooke:"",   jack:"R",  stuart:"" },
+  { id:39, group:false, ms:false, cp:true,  name:"CFD Model Research & Dev",               start:"2026-03-31", dur:132,pred:"54",     brooke:"",   jack:"",   stuart:"R" },
+  { id:40, group:false, ms:false, cp:false, name:"Optimiser GUI",                          start:"2026-02-09", dur:243,pred:"54",     brooke:"R",  jack:"",   stuart:"" },
+  { id:59, group:false, ms:true,  cp:true,  name:"◆ Thermal modelling & CFD/FEA in optimiser", start:"2026-09-20", dur:0, pred:"38,39", brooke:"", jack:"R", stuart:"R" },
+  { id:60, group:false, ms:true,  cp:false, name:"◆ Cold-flow experimental data collected",start:"2026-09-30", dur:0,  pred:"36",     brooke:"A",  jack:"",   stuart:"R" },
+  { id:61, group:false, ms:true,  cp:true,  name:"◆ Final CEM validation & UQ completed",  start:"2026-10-10", dur:0,  pred:"59,60",  brooke:"A",  jack:"R",  stuart:"R" },
+  { id:62, group:false, ms:true,  cp:false, name:"◆ GUI for optimiser completed",          start:"2026-10-10", dur:0,  pred:"40",     brooke:"A",  jack:"",   stuart:"" },
+
+  // ── PHASE 9: Capstone Assessment ──────────────────────────────────────
+  { id:41, group:true,  ms:false, cp:false, name:"Unimelb Capstone Assessment",            start:"2026-01-10", dur:13, pred:"",       brooke:"R",  jack:"C",  stuart:"" },
+  { id:42, group:false, ms:false, cp:false, name:"Draft Capstone Report",                  start:"2026-01-10", dur:4,  pred:"",       brooke:"R",  jack:"C",  stuart:"" },
+  { id:44, group:false, ms:false, cp:false, name:"Endeavour Preparation",                  start:"2026-01-10", dur:13, pred:"",       brooke:"R",  jack:"C",  stuart:"" },
+  { id:63, group:false, ms:true,  cp:false, name:"◆ Draft Capstone report completed",      start:"2026-10-16", dur:0,  pred:"42",     brooke:"R",  jack:"C",  stuart:"" },
+  { id:43, group:false, ms:false, cp:true,  name:"Final Capstone Report (write-up)",       start:"2026-10-16", dur:2,  pred:"61",     brooke:"R",  jack:"C",  stuart:"" },
+  { id:64, group:false, ms:true,  cp:true,  name:"◆ Final Capstone report submitted — S2 Wk12", start:"2026-10-23", dur:0, pred:"43", brooke:"R", jack:"X", stuart:"X" },
+  { id:65, group:false, ms:true,  cp:true,  name:"◆ Oral Presentation / Exam",             start:"2026-11-13", dur:0,  pred:"64",     brooke:"R",  jack:"R",  stuart:"R" },
+
 ];
-let nid=200, mIsGrp=false, mIsMs=false;
 
-const WEEKW=30, DAYW=WEEKW/7;
-const pd=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
-const addD=(dt,n)=>{const d=new Date(dt);d.setDate(d.getDate()+n);return d;};
-const diff=(a,b)=>Math.round((b-a)/86400000);
-const toS=d=>d.toISOString().slice(0,10);
-const fmt=s=>pd(s).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'2-digit'});
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║                         DATA SECTION END                                ║
+// ║  ── Do not edit below this line unless you know what you're doing ──    ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
 
-function bnds(){
-  let mn=pd("2025-10-01"),mx=pd("2026-12-20");
-  tasks.forEach(t=>{const s=pd(t.start),e=addD(s,t.dur||0);if(s<mn)mn=s;if(e>mx)mx=e;});
-  while(mn.getDay()!==1)mn=addD(mn,-1);
-  while(mx.getDay()!==0)mx=addD(mx,1);
-  return{mn,mx};
+let tasks = TASKS.map(t => Object.assign({}, t));
+let nid = 300, mIsGrp = false, mIsMs = false;
+
+const WEEKW = 30, DAYW = WEEKW / 7;
+const pd  = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); };
+const addD= (dt,n) => { const d = new Date(dt); d.setDate(d.getDate()+n); return d; };
+const diff= (a,b) => Math.round((b-a)/86400000);
+const toS = d => d.toISOString().slice(0,10);
+const fmt = s => pd(s).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'2-digit'});
+
+function bnds() {
+  let mn = pd("2025-10-01"), mx = pd("2026-12-20");
+  tasks.forEach(t => {
+    const s = pd(t.start), e = addD(s, t.dur||0);
+    if (s < mn) mn = s; if (e > mx) mx = e;
+  });
+  while (mn.getDay() !== 1) mn = addD(mn,-1);
+  while (mx.getDay() !== 0) mx = addD(mx,1);
+  return { mn, mx };
 }
 
-/* ── LEFT ── */
-function renderL(){
-  const tb=document.getElementById('tb');tb.innerHTML='';
-  tasks.forEach((t,i)=>{
-    const tr=document.createElement('tr');
-    if(t.group)tr.classList.add('group-row');
-    if(t.ms)tr.classList.add('milestone-row');
-    if(t.cp)tr.classList.add('crit-row');
-    const fin=t.ms?t.start:toS(addD(pd(t.start),t.dur));
-    const dd=t.ms?'◆ 0d':t.dur+'d';
-    const ind=t.group||t.ms?'8px':'20px';
-    tr.innerHTML=`
+function renderL() {
+  const tb = document.getElementById('tb'); tb.innerHTML = '';
+  tasks.forEach((t,i) => {
+    const tr = document.createElement('tr');
+    if (t.group) tr.classList.add('group-row');
+    if (t.ms)    tr.classList.add('milestone-row');
+    if (t.cp)    tr.classList.add('crit-row');
+    const fin = t.ms ? t.start : toS(addD(pd(t.start), t.dur));
+    const dd  = t.ms ? '◆ 0d' : t.dur + 'd';
+    const ind = (t.group || t.ms) ? '8px' : '20px';
+    tr.innerHTML = `
       <td class="rn">${i+1}</td>
       <td class="tntd" style="padding-left:${ind}">
         <span class="tnv" contenteditable="true"
@@ -303,9 +358,9 @@ function renderL(){
       <td class="dtc ed" onclick="ied(this,${t.id},'start')">${fmt(t.start)}</td>
       <td class="dtc">${fmt(fin)}</td>
       <td class="pc ed" onclick="ied(this,${t.id},'pred')">${t.pred||'–'}</td>
-      <td class="rc">${rs(t.id,'brooke',t.brooke)}</td>
-      <td class="rc">${rs(t.id,'jack',t.jack)}</td>
-      <td class="rc">${rs(t.id,'stuart',t.stuart)}</td>
+      <td class="rc">${rsel(t.id,'brooke',t.brooke)}</td>
+      <td class="rc">${rsel(t.id,'jack',t.jack)}</td>
+      <td class="rc">${rsel(t.id,'stuart',t.stuart)}</td>
       <td><button class="btn danger" style="padding:1px 5px;font-size:10px" onclick="del(${t.id})">✕</button></td>
     `;
     tb.appendChild(tr);
@@ -313,8 +368,8 @@ function renderL(){
   document.querySelectorAll('.rs').forEach(apR);
 }
 
-function rs(id,p,v){
-  return`<select class="rs ${v||'e'}" onchange="sf(${id},'${p}',this.value);apR(this)">
+function rsel(id, p, v) {
+  return `<select class="rs ${v||'e'}" onchange="sf(${id},'${p}',this.value);apR(this)">
     <option value="">–</option>
     <option ${v==='R'?'selected':''}>R</option>
     <option ${v==='A'?'selected':''}>A</option>
@@ -323,159 +378,165 @@ function rs(id,p,v){
     <option ${v==='X'?'selected':''}>X</option>
   </select>`;
 }
-function apR(s){s.className='rs '+(s.value||'e');}
+function apR(s) { s.className = 'rs ' + (s.value||'e'); }
 
-function ied(td,id,f){
-  const t=tasks.find(x=>x.id===id);if(!t||(t.ms&&f==='dur'))return;
-  const orig=f==='dur'?t.dur:f==='start'?t.start:t.pred;
-  const inp=document.createElement('input');inp.className='ci';
-  inp.type=f==='dur'?'number':f==='start'?'date':'text';
-  inp.value=orig||'';td.textContent='';td.appendChild(inp);inp.focus();
-  inp.onblur=()=>{sf(id,f,inp.value);render();};
-  inp.onkeydown=e=>{if(e.key==='Enter')inp.blur();};
+function ied(td, id, f) {
+  const t = tasks.find(x => x.id===id);
+  if (!t || (t.ms && f==='dur')) return;
+  const orig = f==='dur' ? t.dur : f==='start' ? t.start : t.pred;
+  const inp = document.createElement('input'); inp.className = 'ci';
+  inp.type = f==='dur' ? 'number' : f==='start' ? 'date' : 'text';
+  inp.value = orig||''; td.textContent=''; td.appendChild(inp); inp.focus();
+  inp.onblur = () => { sf(id, f, inp.value); render(); };
+  inp.onkeydown = e => { if (e.key==='Enter') inp.blur(); };
 }
 
-/* ── GANTT ── */
-function renderG(){
-  const{mn,mx}=bnds();
-  const td=diff(mn,mx),tw=Math.ceil(td/7),tw_px=tw*WEEKW;
-  const today=new Date();today.setHours(0,0,0,0);
-  const toff=diff(mn,today);
+function renderG() {
+  const { mn, mx } = bnds();
+  const td = diff(mn,mx), tw = Math.ceil(td/7), twpx = tw*WEEKW;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const toff = diff(mn, today);
 
-  // months
-  const mEl=document.getElementById('gmonths');mEl.innerHTML='';
-  let cur=new Date(mn.getFullYear(),mn.getMonth(),1);
-  while(cur<=mx){
-    const ds=Math.max(0,diff(mn,new Date(cur.getFullYear(),cur.getMonth(),1)));
-    const de=Math.min(td,diff(mn,new Date(cur.getFullYear(),cur.getMonth()+1,0))+1);
-    const c=document.createElement('div');c.className='mc';c.style.width=((de-ds)*DAYW)+'px';
-    c.textContent=cur.toLocaleDateString('en-AU',{month:'short',year:'2-digit'});
-    mEl.appendChild(c);cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);
+  const mEl = document.getElementById('gmonths'); mEl.innerHTML = '';
+  let cur = new Date(mn.getFullYear(), mn.getMonth(), 1);
+  while (cur <= mx) {
+    const ds = Math.max(0, diff(mn, new Date(cur.getFullYear(), cur.getMonth(), 1)));
+    const de = Math.min(td, diff(mn, new Date(cur.getFullYear(), cur.getMonth()+1, 0))+1);
+    const c = document.createElement('div'); c.className='mc'; c.style.width=((de-ds)*DAYW)+'px';
+    c.textContent = cur.toLocaleDateString('en-AU',{month:'short',year:'2-digit'});
+    mEl.appendChild(c); cur = new Date(cur.getFullYear(), cur.getMonth()+1, 1);
   }
 
-  // weeks
-  const wEl=document.getElementById('gweeks');wEl.innerHTML='';
-  for(let w=0;w<tw;w++){
-    const wd=addD(mn,w*7);const c=document.createElement('div');c.className='wc';
-    if(Math.floor(toff/7)===w)c.classList.add('tw');
-    c.style.width=WEEKW+'px';c.textContent=wd.getDate()+'/'+(wd.getMonth()+1);
+  const wEl = document.getElementById('gweeks'); wEl.innerHTML = '';
+  for (let w=0; w<tw; w++) {
+    const wd = addD(mn, w*7);
+    const c = document.createElement('div'); c.className='wc';
+    if (Math.floor(toff/7)===w) c.classList.add('tw');
+    c.style.width = WEEKW+'px';
+    c.textContent = wd.getDate()+'/'+(wd.getMonth()+1);
     wEl.appendChild(c);
   }
 
-  // body
-  const body=document.getElementById('gbody');
-  Array.from(body.children).forEach(ch=>{if(!ch.classList.contains('tl'))body.removeChild(ch);});
-  body.style.width=tw_px+'px';
+  const body = document.getElementById('gbody');
+  Array.from(body.children).forEach(ch => { if (!ch.classList.contains('tl')) body.removeChild(ch); });
+  document.getElementById('gantt-scroll').style.width = twpx+'px';
+  document.getElementById('gsw').style.width = twpx+'px';
+  body.style.width = twpx+'px';
 
-  // today line
-  const tl=document.getElementById('tline');
-  tl.style.left=(toff*DAYW)+'px';tl.style.height=(tasks.length*32+8)+'px';
+  const tl = document.getElementById('tline');
+  tl.style.left = (toff*DAYW)+'px';
+  tl.style.height = (tasks.length*32+8)+'px';
 
-  tasks.forEach(t=>{
-    const row=document.createElement('div');row.className='gr';row.style.width=tw_px+'px';
-    // bg cells
-    for(let w=0;w<tw;w++){
-      const c=document.createElement('div');
-      c.className='gc'+(Math.floor(toff/7)===w?' tc':'');c.style.width=WEEKW+'px';row.appendChild(c);
+  tasks.forEach(t => {
+    const row = document.createElement('div'); row.className='gr'; row.style.width=twpx+'px';
+    for (let w=0; w<tw; w++) {
+      const c = document.createElement('div');
+      c.className = 'gc' + (Math.floor(toff/7)===w?' tc':'');
+      c.style.width = WEEKW+'px'; row.appendChild(c);
     }
-    const sDate=pd(t.start);
-    const bL=diff(mn,sDate)*DAYW;
+    const sDate = pd(t.start);
+    const bL = diff(mn, sDate) * DAYW;
 
-    if(t.ms){
-      // diamond
-      const dm=document.createElement('div');dm.className='md';dm.style.left=(bL-7)+'px';
-      dm.title=t.name+'\n'+fmt(t.start)+(t.cp?'\n⚠ Critical Path':'');row.appendChild(dm);
-      // label
-      const lb=document.createElement('div');lb.className='ml';lb.style.left=(bL+12)+'px';
-      lb.textContent=t.name;row.appendChild(lb);
+    if (t.ms) {
+      const dm = document.createElement('div'); dm.className='md'; dm.style.left=(bL-7)+'px';
+      dm.title = t.name + '\n' + fmt(t.start) + (t.cp?'\n⚠ Critical Path':'');
+      row.appendChild(dm);
+      const lb = document.createElement('div'); lb.className='ml'; lb.style.left=(bL+12)+'px';
+      lb.textContent = t.name.replace(/^◆\s*/,'');
+      row.appendChild(lb);
     } else {
-      const bW=Math.max(t.dur*DAYW,4);
-      const bar=document.createElement('div');
-      bar.className='bar '+(t.group?'grp':'task')+(t.cp&&!t.group?' crit':'');
-      bar.style.left=bL+'px';bar.style.width=bW+'px';
-      if(!t.group&&t.dur>4)bar.textContent=t.name.substring(0,24);
-      bar.title=`${t.name}\n${fmt(t.start)} → ${fmt(toS(addD(sDate,t.dur)))} (${t.dur}d)${t.cp?'\n⚠ Critical Path':''}`;
-      drag(bar,t,mn);row.appendChild(bar);
+      const bW = Math.max(t.dur*DAYW, 4);
+      const bar = document.createElement('div');
+      bar.className = 'bar ' + (t.group?'grp':'task') + (t.cp&&!t.group?' crit':'');
+      bar.style.left=bL+'px'; bar.style.width=bW+'px';
+      if (!t.group && t.dur>4) bar.textContent = t.name.substring(0,24);
+      bar.title = `${t.name}\n${fmt(t.start)} → ${fmt(toS(addD(sDate,t.dur)))} (${t.dur}d)${t.cp?'\n⚠ Critical Path':''}`;
+      drag(bar, t); row.appendChild(bar);
     }
     body.appendChild(row);
   });
 }
 
-function drag(bar,t,mn){
-  let sx,ol;
-  bar.addEventListener('mousedown',e=>{
-    sx=e.clientX;ol=parseFloat(bar.style.left);bar.style.cursor='grabbing';
-    const mv=ev=>{bar.style.left=Math.max(0,ol+(ev.clientX-sx))+'px';};
-    const up=ev=>{
-      document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);
+function drag(bar, t) {
+  let sx, ol;
+  bar.addEventListener('mousedown', e => {
+    sx=e.clientX; ol=parseFloat(bar.style.left); bar.style.cursor='grabbing';
+    const mv = ev => { bar.style.left = Math.max(0, ol+(ev.clientX-sx))+'px'; };
+    const up = ev => {
+      document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up);
       bar.style.cursor='grab';
-      const sh=Math.round((ev.clientX-sx)/DAYW);
-      if(sh){t.start=toS(addD(pd(t.start),sh));render();}
+      const sh = Math.round((ev.clientX-sx)/DAYW);
+      if (sh) { t.start = toS(addD(pd(t.start),sh)); render(); }
     };
-    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();
+    document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up);
+    e.preventDefault();
   });
 }
 
-function syncH(){
-  requestAnimationFrame(()=>{
-    const lr=document.querySelectorAll('#tb tr'),gr=document.querySelectorAll('#gbody .gr');
-    lr.forEach((r,i)=>{const h=Math.max(r.offsetHeight,32);if(gr[i])gr[i].style.height=h+'px';});
+function syncH() {
+  requestAnimationFrame(() => {
+    const lr = document.querySelectorAll('#tb tr');
+    const gr = document.querySelectorAll('#gbody .gr');
+    lr.forEach((r,i) => { const h=Math.max(r.offsetHeight,32); if(gr[i]) gr[i].style.height=h+'px'; });
   });
 }
 
-function sf(id,f,v){
-  const t=tasks.find(x=>x.id===id);if(!t)return;
-  if(f==='dur')t.dur=Math.max(0,parseInt(v)||0);else t[f]=v;
+function sf(id, f, v) {
+  const t = tasks.find(x => x.id===id); if (!t) return;
+  if (f==='dur') t.dur = Math.max(0, parseInt(v)||0); else t[f] = v;
 }
-function del(id){tasks=tasks.filter(t=>t.id!==id);render();}
+function del(id) { tasks = tasks.filter(t => t.id!==id); render(); }
 
-/* ── MODAL ── */
-function openM(grp,ms){
-  mIsGrp=grp;mIsMs=ms;
-  document.getElementById('mtitle').textContent=ms?'Add Milestone':grp?'Add Group':'Add Task';
+function openM(grp, ms) {
+  mIsGrp=grp; mIsMs=ms;
+  document.getElementById('mtitle').textContent = ms?'Add Milestone':grp?'Add Group':'Add Task';
   document.getElementById('mn').value='';
-  document.getElementById('ms').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ms_in').value = new Date().toISOString().slice(0,10);
   document.getElementById('md').value=14;
   document.getElementById('mp').value='';
   document.getElementById('mcp').checked=false;
-  document.getElementById('mbr').value='';document.getElementById('mjk').value='';document.getElementById('mst').value='';
-  document.getElementById('drow').style.display=ms?'none':'flex';
+  document.getElementById('mbr').value=''; document.getElementById('mjk').value=''; document.getElementById('mst').value='';
+  document.getElementById('drow').style.display = ms?'none':'flex';
   document.getElementById('modal').classList.add('open');
 }
-function closeM(){document.getElementById('modal').classList.remove('open');}
-function saveM(){
-  const name=document.getElementById('mn').value.trim()||'New';
-  const start=document.getElementById('ms').value;
-  const dur=mIsMs?0:parseInt(document.getElementById('md').value)||14;
-  const pred=document.getElementById('mp').value.trim();
-  const cp=document.getElementById('mcp').checked;
-  const brooke=document.getElementById('mbr').value,jack=document.getElementById('mjk').value,stuart=document.getElementById('mst').value;
-  tasks.push({id:nid++,group:mIsGrp,ms:mIsMs,cp,name,start,dur,pred,brooke,jack,stuart});
-  closeM();render();
+function closeM() { document.getElementById('modal').classList.remove('open'); }
+function saveM() {
+  const name   = document.getElementById('mn').value.trim()||'New';
+  const start  = document.getElementById('ms_in').value;
+  const dur    = mIsMs ? 0 : (parseInt(document.getElementById('md').value)||14);
+  const pred   = document.getElementById('mp').value.trim();
+  const cp     = document.getElementById('mcp').checked;
+  const brooke = document.getElementById('mbr').value;
+  const jack   = document.getElementById('mjk').value;
+  const stuart = document.getElementById('mst').value;
+  tasks.push({ id:nid++, group:mIsGrp, ms:mIsMs, cp, name, start, dur, pred, brooke, jack, stuart });
+  closeM(); render();
 }
 
-/* ── CSV ── */
-function exportCSV(){
-  const rows=[['#','Type','Name','Duration','Start','Finish','Predecessors','Critical Path','Brooke','Jack','Stuart']];
-  tasks.forEach((t,i)=>{
-    const fin=t.ms?t.start:toS(addD(pd(t.start),t.dur));
-    const type=t.ms?'Milestone':t.group?'Group':'Task';
-    rows.push([i+1,type,t.name,t.ms?'0':t.dur+'d',t.start,fin,t.pred||'',t.cp?'Yes':'',t.brooke,t.jack,t.stuart]);
+function exportCSV() {
+  const rows = [['#','Type','Name','Duration','Start','Finish','Predecessors','Critical Path','Brooke','Jack','Stuart']];
+  tasks.forEach((t,i) => {
+    const fin  = t.ms ? t.start : toS(addD(pd(t.start), t.dur));
+    const type = t.ms ? 'Milestone' : t.group ? 'Group' : 'Task';
+    rows.push([i+1, type, t.name, t.ms?'0':t.dur+'d', t.start, fin, t.pred||'', t.cp?'Yes':'', t.brooke, t.jack, t.stuart]);
   });
-  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='gantt-raci.csv';a.click();
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'gantt-raci.csv'; a.click();
 }
 
-/* ── RENDER ── */
-function render(){renderL();renderG();syncH();document.querySelectorAll('.rs').forEach(apR);}
+function render() {
+  renderL(); renderG(); syncH();
+  document.querySelectorAll('.rs').forEach(apR);
+}
 
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', () => {
   render();
-  const lp=document.getElementById('lp'),rp=document.getElementById('rp');
-  let sy=false;
-  lp.addEventListener('scroll',()=>{if(sy)return;sy=true;rp.scrollTop=lp.scrollTop;sy=false;});
-  rp.addEventListener('scroll',()=>{if(sy)return;sy=true;lp.scrollTop=rp.scrollTop;sy=false;});
+  const lp = document.getElementById('lp'), rp = document.getElementById('rp');
+  let sy = false;
+  lp.addEventListener('scroll', () => { if(sy)return; sy=true; rp.scrollTop=lp.scrollTop; sy=false; });
+  rp.addEventListener('scroll', () => { if(sy)return; sy=true; lp.scrollTop=rp.scrollTop; sy=false; });
 });
 </script>
 </body>
