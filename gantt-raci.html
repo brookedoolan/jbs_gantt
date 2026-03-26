@@ -156,6 +156,7 @@
     <button class="btn" onclick="openM(true,false)">+ Group</button>
     <button class="btn" onclick="openM(false,true)">◆ Milestone</button>
     <button class="btn" onclick="exportCSV()">↓ CSV</button>
+    <button class="btn" onclick="copyData()" id="copyBtn">⎘ Copy Data</button>
   </div>
 </div>
 
@@ -226,17 +227,17 @@
 
 <script>
 // ╔══════════════════════════════════════════════════════════════════════════╗
-// ║                        DATA SECTION START                               ║
-// ║  Edit tasks here. Do not edit anything below "DATA SECTION END".        ║
+// ║                        DATA SECTION START                                ║
+// ║  Edit tasks here. Do not edit anything below "DATA SECTION END".         ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 
 const TASKS = [
 
   // ── PHASE 1: Project Scope & Architecture ──────────────────────────────
-  { id:1,  group:true,  ms:false, cp:false, name:"Project Scope & Architecture",           start:"2025-11-03", dur:15, pred:"",       brooke:"A",  jack:"R",  stuart:"" },
-  { id:2,  group:false, ms:false, cp:false, name:"Draft Initial Project Plan",             start:"2025-11-03", dur:15, pred:"",       brooke:"",   jack:"R",  stuart:"" },
-  { id:3,  group:false, ms:false, cp:false, name:"AM Sponsor Sourcing",                    start:"2025-11-03", dur:15, pred:"",       brooke:"",   jack:"R",  stuart:"" },
-  { id:4,  group:false, ms:false, cp:true,  name:"Project Scope Defined",                  start:"2025-11-03", dur:15, pred:"",       brooke:"R",  jack:"",   stuart:"" },
+  { id:1,  group:true,  ms:false, cp:false, name:"Project Scope & Architecture",           start:"2025-11-03", dur:20, pred:"",       brooke:"A",  jack:"R",  stuart:"" },
+  { id:2,  group:false, ms:false, cp:false, name:"Draft Initial Project Plan",             start:"2025-11-03", dur:20, pred:"",       brooke:"",   jack:"R",  stuart:"" },
+  { id:3,  group:false, ms:false, cp:false, name:"AM Sponsor Sourcing",                    start:"2025-11-03", dur:20, pred:"",       brooke:"",   jack:"R",  stuart:"" },
+  { id:4,  group:false, ms:false, cp:true,  name:"Project Scope Defined",                  start:"2025-11-03", dur:20, pred:"",       brooke:"R",  jack:"",   stuart:"" },
   { id:5,  group:false, ms:false, cp:false, name:"Race2Space Submission",                  start:"2025-10-11", dur:10, pred:"",       brooke:"",   jack:"R",  stuart:"" },
   { id:51, group:false, ms:true,  cp:true,  name:"◆ Project scope & architecture defined", start:"2025-11-24", dur:0,  pred:"4",      brooke:"A",  jack:"R",  stuart:"" },
 
@@ -524,6 +525,19 @@ function exportCSV() {
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
   a.download = 'gantt-raci.csv'; a.click();
+}
+
+function copyData() {
+  const lines = tasks.map(t => {
+    const q = s => s ? `"${s.replace(/"/g,'\\"')}"` : '""';
+    return `  { id:${t.id}, group:${t.group}, ms:${t.ms}, cp:${t.cp}, name:${q(t.name)}, start:${q(t.start)}, dur:${t.dur}, pred:${q(t.pred||'')}, brooke:${q(t.brooke||'')}, jack:${q(t.jack||'')}, stuart:${q(t.stuart||'')} }`;
+  });
+  const out = `const TASKS = [\n${lines.join(',\n')}\n];`;
+  navigator.clipboard.writeText(out).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!'; btn.classList.add('primary');
+    setTimeout(() => { btn.textContent = '⎘ Copy Data'; btn.classList.remove('primary'); }, 2000);
+  });
 }
 
 function render() {
