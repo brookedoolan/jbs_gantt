@@ -192,6 +192,7 @@
     <button class="btn" onclick="copyData()" id="copyBtn">⎘ Copy Data</button>
     <button class="btn" onclick="window.print()">↓ PDF</button>
     <button class="btn" id="depsBtn" onclick="toggleDeps()">⤳ Deps</button>
+    <button class="btn" onclick="autoSchedule()">⟳ Reschedule</button>
   </div>
 </div>
 
@@ -291,20 +292,20 @@ const TASKS = [
   { id:300, group:false, ms:true,  cp:false, name:"Race2Space EOI Submission",                             start:"2025-11-04", dur:0,   pred:"",       brooke:"R", jack:"A",  stuart:"",   supervisor:"I", extAdvisors:"",  brookeHrs:8,  jackHrs:40, stuartHrs:0,  supervisorHrs:2,  extAdvisorsHrs:0  },
   { id:2,   group:false, ms:false, cp:false, name:"Draft Initial Project Plan",                            start:"2025-11-03", dur:20,  pred:"",       brooke:"R", jack:"A",  stuart:"",   supervisor:"",  extAdvisors:"",  brookeHrs:15, jackHrs:50, stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:0  },
   { id:3,   group:false, ms:false, cp:false, name:"AM Sponsor Sourcing",                                   start:"2025-11-03", dur:20,  pred:"",       brooke:"",  jack:"R",  stuart:"",   supervisor:"",  extAdvisors:"A", brookeHrs:0,  jackHrs:12, stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:35 },
-  { id:51,  group:false, ms:true,  cp:true,  name:"◆ Final Project scope & architecture defined",          start:"2025-11-24", dur:0,   pred:"4",      brooke:"R", jack:"A",  stuart:"R",  supervisor:"X", extAdvisors:"I", brookeHrs:5,  jackHrs:38, stuartHrs:6,  supervisorHrs:3,  extAdvisorsHrs:2  },
+  { id:51,  group:false, ms:true,  cp:true,  name:"◆ Final Project scope & architecture defined",          start:"2025-11-24", dur:0,   pred:"",      brooke:"R", jack:"A",  stuart:"R",  supervisor:"X", extAdvisors:"I", brookeHrs:5,  jackHrs:38, stuartHrs:6,  supervisorHrs:3,  extAdvisorsHrs:2  },
   { id:6,   group:true,  ms:false, cp:true,  name:"Initial Engine Design",                                 start:"2025-11-24", dur:30,  pred:"51",     brooke:"R", jack:"A",  stuart:"R",  supervisor:"C", extAdvisors:"",  brookeHrs:18, jackHrs:55, stuartHrs:15, supervisorHrs:8,  extAdvisorsHrs:0  },
   { id:7,   group:false, ms:false, cp:true,  name:"Prelim. Geom. Chamber",                                 start:"2025-11-24", dur:30,  pred:"51",     brooke:"",  jack:"R",  stuart:"A",  supervisor:"",  extAdvisors:"",  brookeHrs:0,  jackHrs:14, stuartHrs:45, supervisorHrs:0,  extAdvisorsHrs:0  },
   { id:8,   group:false, ms:false, cp:true,  name:"Prelim. Geom. Injector",                                start:"2025-11-24", dur:30,  pred:"51",     brooke:"",  jack:"A",  stuart:"R",  supervisor:"",  extAdvisors:"",  brookeHrs:0,  jackHrs:42, stuartHrs:18, supervisorHrs:0,  extAdvisorsHrs:0  },
   { id:9,   group:false, ms:false, cp:false, name:"RPA Engine Geometry, 1D",                               start:"2025-11-24", dur:30,  pred:"51",     brooke:"A", jack:"",   stuart:"",   supervisor:"",  extAdvisors:"",  brookeHrs:40, jackHrs:0,  stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:0  },
   { id:10,  group:false, ms:false, cp:false, name:"Thrust Structure Design",                               start:"2025-11-24", dur:30,  pred:"51",     brooke:"A", jack:"",   stuart:"",   supervisor:"",  extAdvisors:"",  brookeHrs:38, jackHrs:0,  stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:0  },
-  { id:11,  group:false, ms:false, cp:true,  name:"PDR Report",                                            start:"2025-12-20", dur:10,  pred:"7,8",    brooke:"A", jack:"R",  stuart:"R",  supervisor:"",  extAdvisors:"",  brookeHrs:45, jackHrs:12, stuartHrs:10, supervisorHrs:0,  extAdvisorsHrs:0  },
-  { id:52,  group:false, ms:true,  cp:true,  name:"◆ Initial geometry & prelim. calcs done",              start:"2026-01-01", dur:0,   pred:"11",     brooke:"R", jack:"R",  stuart:"A",  supervisor:"X", extAdvisors:"C", brookeHrs:8,  jackHrs:6,  stuartHrs:40, supervisorHrs:4,  extAdvisorsHrs:8  },
+  { id:11,  group:false, ms:false, cp:true,  name:"PDR Report",                                            start:"2025-12-20", dur:10,  pred:"6",    brooke:"A", jack:"R",  stuart:"R",  supervisor:"",  extAdvisors:"",  brookeHrs:45, jackHrs:12, stuartHrs:10, supervisorHrs:0,  extAdvisorsHrs:0  },
+  { id:52,  group:false, ms:true,  cp:true,  name:"◆ Initial geometry & prelim. calcs done",              start:"2026-01-01", dur:0,   pred:"6",     brooke:"R", jack:"R",  stuart:"A",  supervisor:"X", extAdvisors:"C", brookeHrs:8,  jackHrs:6,  stuartHrs:40, supervisorHrs:4,  extAdvisorsHrs:8  },
   { id:53,  group:false, ms:true,  cp:true,  name:"◆ PDR submitted to Race2Space",                        start:"2026-01-04", dur:0,   pred:"11",     brooke:"A", jack:"R",  stuart:"R",  supervisor:"I", extAdvisors:"",  brookeHrs:35, jackHrs:8,  stuartHrs:6,  supervisorHrs:2,  extAdvisorsHrs:0  },
   { id:12,  group:true,  ms:false, cp:false, name:"Water Flow Testing & Analysis",                         start:"2026-01-05", dur:93,  pred:"53",     brooke:"R", jack:"A",  stuart:"R",  supervisor:"I", extAdvisors:"",  brookeHrs:14, jackHrs:50, stuartHrs:12, supervisorHrs:3,  extAdvisorsHrs:0  },
   { id:13,  group:false, ms:false, cp:false, name:"Prelim. Injector Samples Printed",                      start:"2026-01-05", dur:40,  pred:"53",     brooke:"",  jack:"R",  stuart:"R",  supervisor:"",  extAdvisors:"A", brookeHrs:0,  jackHrs:16, stuartHrs:14, supervisorHrs:0,  extAdvisorsHrs:40 },
   { id:14,  group:false, ms:false, cp:false, name:"Samples Post-Processing",                               start:"2026-02-14", dur:14,  pred:"13",     brooke:"",  jack:"R",  stuart:"",   supervisor:"",  extAdvisors:"A", brookeHrs:0,  jackHrs:18, stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:45 },
-  { id:15,  group:false, ms:false, cp:false, name:"Water Flow Test Stand Manufacture",                     start:"2026-02-14", dur:14,  pred:"13",     brooke:"R", jack:"A",  stuart:"",   supervisor:"",  extAdvisors:"",  brookeHrs:16, jackHrs:42, stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:0  },
-  { id:16,  group:false, ms:false, cp:false, name:"DAQ Hardware & Software",                               start:"2026-02-14", dur:14,  pred:"13",     brooke:"A", jack:"",   stuart:"",   supervisor:"",  extAdvisors:"",  brookeHrs:48, jackHrs:0,  stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:0  },
+  { id:15,  group:false, ms:false, cp:false, name:"Water Flow Test Stand Manufacture",                     start:"2026-02-14", dur:14,  pred:"53",     brooke:"R", jack:"A",  stuart:"",   supervisor:"",  extAdvisors:"",  brookeHrs:16, jackHrs:42, stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:0  },
+  { id:16,  group:false, ms:false, cp:false, name:"DAQ Hardware & Software",                               start:"2026-02-14", dur:14,  pred:"53",     brooke:"A", jack:"",   stuart:"",   supervisor:"",  extAdvisors:"",  brookeHrs:48, jackHrs:0,  stuartHrs:0,  supervisorHrs:0,  extAdvisorsHrs:0  },
   { id:17,  group:false, ms:false, cp:false, name:"Prelim. Water Flow Testing",                            start:"2026-03-01", dur:18,  pred:"15",     brooke:"R", jack:"A",  stuart:"R",  supervisor:"",  extAdvisors:"",  brookeHrs:12, jackHrs:50, stuartHrs:14, supervisorHrs:0,  extAdvisorsHrs:0  },
   { id:18,  group:false, ms:false, cp:false, name:"Secondary Water Flow Testing",                          start:"2026-03-19", dur:20,  pred:"17",     brooke:"R", jack:"A",  stuart:"R",  supervisor:"",  extAdvisors:"",  brookeHrs:14, jackHrs:45, stuartHrs:16, supervisorHrs:0,  extAdvisorsHrs:0  },
   { id:19,  group:true,  ms:false, cp:true,  name:"Stage 1 BRUV – 1D Optimiser",                          start:"2026-01-05", dur:95,  pred:"53",     brooke:"",  jack:"",   stuart:"A",  supervisor:"",  extAdvisors:"",  brookeHrs:0,  jackHrs:0,  stuartHrs:55, supervisorHrs:0,  extAdvisorsHrs:0  },
@@ -603,6 +604,25 @@ function copyData() {
   });
 }
 
+function autoSchedule() {
+  // Iterative forward-pass: push each task's start to max(predecessor finish dates).
+  // Repeat until no task moves (handles chains). Cap at 100 passes to avoid infinite loops.
+  let changed = true, passes = 0;
+  while (changed && passes++ < 100) {
+    changed = false;
+    tasks.forEach(t => {
+      if (!t.pred) return;
+      t.pred.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)).forEach(predId => {
+        const pred = tasks.find(p => p.id === predId);
+        if (!pred) return;
+        const predFinish = toS(addD(pd(pred.start), pred.dur || 0));
+        if (predFinish > t.start) { t.start = predFinish; changed = true; }
+      });
+    });
+  }
+  render();
+}
+
 function toggleDeps() {
   showDeps = !showDeps;
   const btn = document.getElementById('depsBtn');
@@ -639,10 +659,10 @@ function renderDeps() {
 
   tasks.forEach((t, ti) => {
     if (!t.pred) return;
-    t.pred.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)).forEach(rowNum => {
-      const pi = rowNum - 1;
-      if (pi < 0 || pi >= tasks.length) return;
-      const pred = tasks[pi];
+    t.pred.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)).forEach(predId => {
+      const pred = tasks.find(p => p.id === predId);
+      if (!pred) return;
+      const pi = tasks.indexOf(pred);
       const isCp = t.cp && pred.cp;
       const color  = isCp ? 'rgba(255,159,67,0.8)' : 'rgba(120,130,190,0.6)';
       const marker = isCp ? 'arr-cp' : 'arr';
