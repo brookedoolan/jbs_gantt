@@ -145,6 +145,36 @@
   .ckr{display:flex;gap:16px;margin-bottom:10px;}
   .ckr label{display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;}
   .ckr input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;}
+
+  @media print {
+    @page { size: A3 landscape; margin: 10mm; }
+    body { background:#fff !important; color:#111 !important; font-size:10px; }
+    .topbar .toolbar, .btn, .mb { display:none !important; }
+    .topbar { position:static; border-bottom:1px solid #ccc; padding:8px 14px; }
+    .legend { border-bottom:1px solid #ccc; padding:6px 14px; }
+    .topbar-title, .li { color:#111 !important; }
+    .badge.R,.badge.A,.badge.C,.badge.I,.badge.X { border:1px solid #ccc; }
+    .main-wrapper { display:block !important; height:auto !important; overflow:visible !important; }
+    .left-panel {
+      width:100% !important; overflow:visible !important; border:none !important;
+      break-after:page; page-break-after:always;
+    }
+    .right-panel { overflow:visible !important; width:100% !important; }
+    .gsw { position:static !important; }
+    th,td { border-color:#ccc !important; color:#111 !important; background:#fff !important; }
+    tr.group-row>td { background:#fff0f0 !important; }
+    tr.crit-row>td { border-left:2px solid #f90 !important; }
+    .mc,.wc { background:#fff !important; color:#444 !important; border-color:#ccc !important; }
+    .wc.tw { border-left:2px solid #e33 !important; color:#e33 !important; }
+    .gr { background:#fff !important; border-bottom:1px solid #eee !important; }
+    .gc { border-right:1px solid #eee !important; }
+    .tl { background:#e33 !important; opacity:.5; }
+    .bar.task { background:linear-gradient(90deg,#3d6fff,#6b4fff) !important; }
+    .bar.crit { background:linear-gradient(90deg,#ff9f43,#ff6348) !important; }
+    .bar.grp  { background:linear-gradient(90deg,#ff5e5e,#e03030) !important; }
+    .md { border-color:#111 !important; background:#fff !important; }
+    .rs { border:1px solid #ccc !important; border-radius:3px; }
+  }
 </style>
 </head>
 <body>
@@ -157,6 +187,7 @@
     <button class="btn" onclick="openM(false,true)">◆ Milestone</button>
     <button class="btn" onclick="exportCSV()">↓ CSV</button>
     <button class="btn" onclick="copyData()" id="copyBtn">⎘ Copy Data</button>
+    <button class="btn" onclick="window.print()">↓ PDF</button>
   </div>
 </div>
 
@@ -294,7 +325,7 @@ const TASKS = [
   { id:44, group:false, ms:false, cp:false, name:"Endeavour Preparation", start:"2026-10-01", dur:16, pred:"", brooke:"R", jack:"A", stuart:"", supervisor:"", extAdvisors:"" },
   { id:63, group:false, ms:true, cp:false, name:"◆ Draft Capstone report completed", start:"2026-10-16", dur:0, pred:"42", brooke:"A", jack:"R", stuart:"", supervisor:"", extAdvisors:"" },
   { id:43, group:false, ms:false, cp:true, name:"Final Capstone Report (write-up)", start:"2026-10-16", dur:8, pred:"61", brooke:"A", jack:"R", stuart:"", supervisor:"", extAdvisors:"" },
-  { id:64, group:false, ms:true, cp:true, name:"◆ Final Capstone report submitted — S2 Wk12", start:"2026-10-23", dur:0, pred:"43", brooke:"A", jack:"R", stuart:"R", supervisor:"C", extAdvisors:"I" },
+  { id:64, group:false, ms:true, cp:true, name:"◆ Final Capstone report submitted", start:"2026-10-23", dur:0, pred:"43", brooke:"A", jack:"R", stuart:"R", supervisor:"C", extAdvisors:"I" },
   { id:65, group:false, ms:true, cp:true, name:"◆ Oral Presentation / Exam", start:"2026-11-13", dur:0, pred:"64", brooke:"R", jack:"A", stuart:"R", supervisor:"C", extAdvisors:"I" }
 ];
 
@@ -548,6 +579,22 @@ document.addEventListener('DOMContentLoaded', () => {
   let sy = false;
   lp.addEventListener('scroll', () => { if(sy)return; sy=true; rp.scrollTop=lp.scrollTop; sy=false; });
   rp.addEventListener('scroll', () => { if(sy)return; sy=true; lp.scrollTop=rp.scrollTop; sy=false; });
+});
+
+window.addEventListener('beforeprint', () => {
+  // Unlock the clipped flex layout so everything renders at natural size for print
+  document.querySelector('.main-wrapper').style.cssText = 'display:block;height:auto;overflow:visible;';
+  document.getElementById('lp').style.cssText = 'width:100%;overflow:visible;border:none;';
+  document.getElementById('rp').style.cssText = 'overflow:visible;width:100%;';
+  document.getElementById('gsw').style.cssText = 'position:static;';
+});
+
+window.addEventListener('afterprint', () => {
+  document.querySelector('.main-wrapper').style.cssText = '';
+  document.getElementById('lp').style.cssText = '';
+  document.getElementById('rp').style.cssText = '';
+  document.getElementById('gsw').style.cssText = '';
+  render();
 });
 </script>
 </body>
