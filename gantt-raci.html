@@ -668,24 +668,13 @@ function renderDeps() {
       const color  = isCp ? 'rgba(255,159,67,0.8)' : 'rgba(120,130,190,0.6)';
       const marker = isCp ? 'arr-cp' : 'arr';
 
-      const predEndX  = diff(mn, pd(pred.start)) * DAYW + (pred.ms ? 7 : (pred.dur || 0) * DAYW);
-      const taskStartX = diff(mn, pd(t.start)) * DAYW - (t.ms ? 7 : 0);
-      const predY = pi * 32 + 16;
-      const taskY = ti * 32 + 16;
+      const predEndX = diff(mn, pd(pred.start)) * DAYW + (pred.ms ? 7 : (pred.dur || 0) * DAYW);
+      const predY    = pi * 32 + 16;
+      const taskTopY = ti * 32 + (t.ms ? 9 : 6);  // top of bar / top of diamond
 
-      // Stub right, elbow down/up, then across to task start
-      const stubX = taskStartX < predEndX + 20
-        ? Math.max(predEndX, taskStartX) + 20   // backward: loop around
-        : predEndX + 14;
-
-      let d;
-      if (taskStartX >= predEndX + 14) {
-        d = `M${predEndX},${predY} H${stubX} V${taskY} H${taskStartX}`;
-      } else {
-        // Arrow has to loop back — route via a mid-row corridor
-        const midY = Math.max(predY, taskY) + 14;
-        d = `M${predEndX},${predY} H${stubX} V${midY} H${taskStartX - 14} V${taskY} H${taskStartX}`;
-      }
+      // Stub right from pred end, then drop straight down to top of target bar
+      const dropX = predEndX + 12;
+      const d = `M${predEndX},${predY} H${dropX} V${taskTopY}`;
 
       const path = document.createElementNS(NS, 'path');
       path.setAttribute('d', d);
