@@ -663,6 +663,7 @@ function renderDeps() {
       const pred = tasks.find(p => p.id === predId);
       if (!pred) return;
       const pi = tasks.indexOf(pred);
+      if (pi >= ti) return; // skip backward/same-row arrows
       const isCp = t.cp && pred.cp;
       const color  = isCp ? 'rgba(255,159,67,0.8)' : 'rgba(120,130,190,0.6)';
       const marker = isCp ? 'arr-cp' : 'arr';
