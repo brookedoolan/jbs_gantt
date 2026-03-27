@@ -645,36 +645,62 @@ function renderDeps() {
   svg.setAttribute('width', twpx); svg.setAttribute('height', h);
   svg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:15;overflow:visible;';
 
-  // Arrowhead markers
+  // Downward-pointing arrowhead markers (orient=auto rotates the right-arrow 90° on vertical paths)
   const defs = document.createElementNS(NS, 'defs');
-  [['arr','rgba(130,140,200,0.75)'],['arr-cp','rgba(255,159,67,0.9)']].forEach(([id, fill]) => {
+  [['arr','rgba(130,140,200,0.8)'],['arr-cp','rgba(255,159,67,0.95)']].forEach(([id, fill]) => {
     const m = document.createElementNS(NS, 'marker');
     m.setAttribute('id', id); m.setAttribute('markerWidth','7'); m.setAttribute('markerHeight','7');
-    m.setAttribute('refX','6'); m.setAttribute('refY','3.5'); m.setAttribute('orient','auto');
+    m.setAttribute('refX','3.5'); m.setAttribute('refY','0'); m.setAttribute('orient','auto');
     const p = document.createElementNS(NS, 'polygon');
-    p.setAttribute('points','0,0 7,3.5 0,7'); p.setAttribute('fill', fill);
+    p.setAttribute('points','0,0 7,0 3.5,6'); p.setAttribute('fill', fill); // downward triangle
     m.appendChild(p); defs.appendChild(m);
   });
   svg.appendChild(defs);
 
   tasks.forEach((t, ti) => {
     if (!t.pred) return;
-    t.pred.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)).forEach(predId => {
-      const pred = tasks.find(p => p.id === predId);
-      if (!pred) return;
-      const pi = tasks.indexOf(pred);
-      if (pi >= ti) return; // skip backward/same-row arrows
-      const isCp = t.cp && pred.cp;
-      const color  = isCp ? 'rgba(255,159,67,0.8)' : 'rgba(120,130,190,0.6)';
-      const marker = isCp ? 'arr-cp' : 'arr';
+
+    // Collect valid (forward-only) predecessors for this task
+    const validPreds = t.pred.split(',')
+      .map(s => parseInt(s.trim())).filter(n => !isNaN(n))
+      .reduce((acc, predId) => {
+        const pred = tasks.find(p => p.id === predId);
+        if (!pred) return acc;
+        const pi = tasks.indexOf(pred);
+        if (pi >= ti) return acc; // forward only
+        acc.push({ pred, pi });
+        return acc;
+      }, []);
+
+    if (!validPreds.length) return;
+
+    // Bar geometry for target task
+    const barX    = diff(mn, pd(t.start)) * DAYW;
+    const barW    = t.ms ? 14 : Math.max((t.dur || 0) * DAYW, 10);
+    const taskTopY = ti * 32 + (t.ms ? 9 : 6);
+
+    validPreds.forEach(({ pred, pi }, idx) => {
+      const isCp     = t.cp && pred.cp;
+      const color    = isCp ? 'rgba(255,159,67,0.85)' : 'rgba(120,130,190,0.65)';
+      const markerId = isCp ? 'arr-cp' : 'arr';
 
       const predEndX = diff(mn, pd(pred.start)) * DAYW + (pred.ms ? 7 : (pred.dur || 0) * DAYW);
       const predY    = pi * 32 + 16;
-      const taskTopY = ti * 32 + (t.ms ? 9 : 6);  // top of bar / top of diamond
 
-      // Stub right from pred end, then drop straight down to top of target bar
-      const dropX = predEndX + 12;
-      const d = `M${predEndX},${predY} H${dropX} V${taskTopY}`;
+      // Stagger landing X across the target bar so multiple arrows don't stack
+      const frac  = validPreds.length === 1 ? 0.25 : idx / (validPreds.length - 1) * 0.6 + 0.1;
+      const landX = barX + Math.round(frac * barW);
+
+      // Route: if pred end is left of landing, simple L-shape; otherwise add a right-stub elbow
+      let d;
+      if (predEndX <= landX - 4) {
+        d = `M${predEndX},${predY} H${landX} V${taskTopY}`;
+      } else {
+        // Pred ends to the right of landX — stub right, drop to corridor, then slide left to landX
+        const stubX  = predEndX + 12;
+        const corrY  = predY + 20; // corridor just below pred row
+        d = `M${predEndX},${predY} H${stubX} V${corrY} H${landX} V${taskTopY}`;
+      }
 
       const path = document.createElementNS(NS, 'path');
       path.setAttribute('d', d);
@@ -682,7 +708,7 @@ function renderDeps() {
       path.setAttribute('stroke', color);
       path.setAttribute('stroke-width', isCp ? '1.8' : '1.3');
       path.setAttribute('stroke-dasharray', isCp ? 'none' : '4,3');
-      path.setAttribute('marker-end', `url(#${marker})`);
+      path.setAttribute('marker-end', `url(#${markerId})`);
       svg.appendChild(path);
     });
   });
