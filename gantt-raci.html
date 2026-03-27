@@ -645,14 +645,14 @@ function renderDeps() {
   svg.setAttribute('width', twpx); svg.setAttribute('height', h);
   svg.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:15;overflow:visible;';
 
-  // Downward-pointing arrowhead markers (orient=auto rotates the right-arrow 90° on vertical paths)
+  // Arrowhead markers — right-pointing shape + orient="auto" rotates it correctly on downward paths
   const defs = document.createElementNS(NS, 'defs');
   [['arr','rgba(130,140,200,0.8)'],['arr-cp','rgba(255,159,67,0.95)']].forEach(([id, fill]) => {
     const m = document.createElementNS(NS, 'marker');
-    m.setAttribute('id', id); m.setAttribute('markerWidth','7'); m.setAttribute('markerHeight','7');
-    m.setAttribute('refX','3.5'); m.setAttribute('refY','0'); m.setAttribute('orient','auto');
+    m.setAttribute('id', id); m.setAttribute('markerWidth','8'); m.setAttribute('markerHeight','8');
+    m.setAttribute('refX','6'); m.setAttribute('refY','3'); m.setAttribute('orient','auto');
     const p = document.createElementNS(NS, 'polygon');
-    p.setAttribute('points','0,0 7,0 3.5,6'); p.setAttribute('fill', fill); // downward triangle
+    p.setAttribute('points','0,0 6,3 0,6'); p.setAttribute('fill', fill);
     m.appendChild(p); defs.appendChild(m);
   });
   svg.appendChild(defs);
