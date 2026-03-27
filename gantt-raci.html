@@ -356,6 +356,7 @@ const TASKS = [
 
 let tasks = TASKS.map(t => Object.assign({}, t));
 let nid = 300, mIsGrp = false, mIsMs = false, showDeps = false;
+let depAnchors = {}; // keyed "predId_taskId" → frac (0–1) along target bar
 
 const WEEKW = 30, DAYW = WEEKW / 7;
 const pd  = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); };
@@ -705,19 +706,20 @@ function renderDeps() {
       const predBarW  = pred.ms ? 14 : Math.max((pred.dur || 0) * DAYW, 10);
       const predTopY  = pi * 32 + (pred.ms ? 9 : 6);
 
-      // Stagger X across the target bar; also pick the corresponding X on the pred bar
-      const frac   = validPreds.length === 1 ? 0.25 : idx / (validPreds.length - 1) * 0.6 + 0.1;
-      const landX  = barX    + Math.round(frac * barW);
-      const srcX   = Math.min(Math.max(landX, predBarX + 4), predBarX + predBarW - 4);
+      // Use stored anchor frac if user has dragged this arrow, else auto-stagger
+      const key     = `${pred.id}_${t.id}`;
+      const defFrac = validPreds.length === 1 ? 0.25 : idx / (validPreds.length - 1) * 0.6 + 0.1;
+      let   frac    = depAnchors[key] !== undefined ? depAnchors[key] : defFrac;
 
-      // If src and land share the same X → pure vertical; otherwise add a horizontal corridor
-      let d;
-      if (Math.abs(srcX - landX) < 4) {
-        d = `M${srcX},${predTopY} V${taskTopY}`;
-      } else {
-        const corrY = predTopY + Math.round((taskTopY - predTopY) * 0.4);
-        d = `M${srcX},${predTopY} V${corrY} H${landX} V${taskTopY}`;
-      }
+      const makePath = (f) => {
+        const lx  = barX + Math.round(f * barW);
+        const sx  = Math.min(Math.max(lx, predBarX + 4), predBarX + predBarW - 4);
+        if (Math.abs(sx - lx) < 4) return { d:`M${sx},${predTopY} V${taskTopY}`, lx, sx };
+        const cy  = predTopY + Math.round((taskTopY - predTopY) * 0.4);
+        return { d:`M${sx},${predTopY} V${cy} H${lx} V${taskTopY}`, lx, sx };
+      };
+
+      let { d, lx: landX } = makePath(frac);
 
       const path = document.createElementNS(NS, 'path');
       path.setAttribute('d', d);
@@ -727,6 +729,37 @@ function renderDeps() {
       path.setAttribute('stroke-dasharray', isCp ? 'none' : '4,3');
       path.setAttribute('marker-end', `url(#${markerId})`);
       svg.appendChild(path);
+
+      // Invisible wide hit-area so the thin line is easy to grab
+      const hit = document.createElementNS(NS, 'path');
+      hit.setAttribute('d', d);
+      hit.setAttribute('fill', 'none');
+      hit.setAttribute('stroke', 'transparent');
+      hit.setAttribute('stroke-width', '12');
+      hit.style.cursor = 'ew-resize';
+      hit.style.pointerEvents = 'stroke';
+      hit.addEventListener('mousedown', e => {
+        e.preventDefault(); e.stopPropagation();
+        const rp = document.getElementById('rp');
+        const startClientX = e.clientX;
+        const startFrac    = frac;
+        const onMove = ev => {
+          const dx      = ev.clientX - startClientX;
+          const newFrac = Math.max(0.02, Math.min(0.98, startFrac + dx / barW));
+          frac = newFrac;
+          depAnchors[key] = newFrac;
+          const { d: nd } = makePath(newFrac);
+          path.setAttribute('d', nd);
+          hit.setAttribute('d', nd);
+        };
+        const onUp = () => {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+      svg.appendChild(hit);
     });
   });
 
