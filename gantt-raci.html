@@ -193,6 +193,7 @@
     <button class="btn" onclick="window.print()">↓ PDF</button>
     <button class="btn" id="depsBtn" onclick="toggleDeps()">⤳ Deps</button>
     <button class="btn" onclick="autoSchedule()">⟳ Reschedule</button>
+    <button class="btn" onclick="cleanPreds()">✂ Clean Preds</button>
   </div>
 </div>
 
@@ -602,6 +603,22 @@ function copyData() {
     btn.textContent = '✓ Copied!'; btn.classList.add('primary');
     setTimeout(() => { btn.textContent = '⎘ Copy Data'; btn.classList.remove('primary'); }, 2000);
   });
+}
+
+function cleanPreds() {
+  tasks.forEach(t => {
+    if (!t.pred) return;
+    const kept = t.pred.split(',')
+      .map(s => parseInt(s.trim())).filter(n => !isNaN(n))
+      .filter(predId => {
+        const pred = tasks.find(p => p.id === predId);
+        if (!pred) return false;
+        const predEnd = toS(addD(pd(pred.start), pred.dur || 0));
+        return t.start >= predEnd;
+      });
+    t.pred = kept.join(',');
+  });
+  render();
 }
 
 function autoSchedule() {
