@@ -684,22 +684,22 @@ function renderDeps() {
       const color    = isCp ? 'rgba(255,159,67,0.85)' : 'rgba(120,130,190,0.65)';
       const markerId = isCp ? 'arr-cp' : 'arr';
 
-      const predEndX = diff(mn, pd(pred.start)) * DAYW + (pred.ms ? 7 : (pred.dur || 0) * DAYW);
-      const predY    = pi * 32 + 16;
+      const predBarX  = diff(mn, pd(pred.start)) * DAYW - (pred.ms ? 7 : 0);
+      const predBarW  = pred.ms ? 14 : Math.max((pred.dur || 0) * DAYW, 10);
+      const predTopY  = pi * 32 + (pred.ms ? 9 : 6);
 
-      // Stagger landing X across the target bar so multiple arrows don't stack
-      const frac  = validPreds.length === 1 ? 0.25 : idx / (validPreds.length - 1) * 0.6 + 0.1;
-      const landX = barX + Math.round(frac * barW);
+      // Stagger X across the target bar; also pick the corresponding X on the pred bar
+      const frac   = validPreds.length === 1 ? 0.25 : idx / (validPreds.length - 1) * 0.6 + 0.1;
+      const landX  = barX    + Math.round(frac * barW);
+      const srcX   = Math.min(Math.max(landX, predBarX + 4), predBarX + predBarW - 4);
 
-      // Route: if pred end is left of landing, simple L-shape; otherwise add a right-stub elbow
+      // If src and land share the same X → pure vertical; otherwise add a horizontal corridor
       let d;
-      if (predEndX <= landX - 4) {
-        d = `M${predEndX},${predY} H${landX} V${taskTopY}`;
+      if (Math.abs(srcX - landX) < 4) {
+        d = `M${srcX},${predTopY} V${taskTopY}`;
       } else {
-        // Pred ends to the right of landX — stub right, drop to corridor, then slide left to landX
-        const stubX  = predEndX + 12;
-        const corrY  = predY + 20; // corridor just below pred row
-        d = `M${predEndX},${predY} H${stubX} V${corrY} H${landX} V${taskTopY}`;
+        const corrY = predTopY + Math.round((taskTopY - predTopY) * 0.4);
+        d = `M${srcX},${predTopY} V${corrY} H${landX} V${taskTopY}`;
       }
 
       const path = document.createElementNS(NS, 'path');
